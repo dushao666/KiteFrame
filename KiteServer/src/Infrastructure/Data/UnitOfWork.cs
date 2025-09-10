@@ -1,8 +1,3 @@
-using Domain.Interfaces;
-using Shared.Models;
-using SqlSugar;
-using Microsoft.Extensions.Logging;
-
 namespace Infrastructure.Data;
 
 /// <summary>
