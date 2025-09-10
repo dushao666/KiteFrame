@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  # KiteServer API 服务
+  kiteserver-api:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    container_name: kiteserver-api
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080;https://+:8081
+      - ConnectionStrings__DefaultConnection=Server=mysql;Database=KiteServerDB;Uid=root;Pwd=123456;
+      - Redis__Host=redis
+      - Redis__Port=6379
+      - Redis__Password=
+      - Redis__Database=0
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - kiteserver-network
+    restart: unless-stopped
+    volumes:
+      - ./logs:/app/logs
+      - ./uploads:/app/uploads
+
+  # MySQL 数据库
+  mysql:
+    image: mysql:8.0
+    container_name: kiteserver-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: KiteServerDB
+      MYSQL_USER: kiteserver
+      MYSQL_PASSWORD: kiteserver123
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d
+    networks:
+      - kiteserver-network
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
+
+  # Redis 缓存
+  redis:
+    image: redis:7-alpine
+    container_name: kiteserver-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - kiteserver-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+  # Nginx 反向代理
+  nginx:
+    image: nginx:alpine
+    container_name: kiteserver-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - kiteserver-api
+    networks:
+      - kiteserver-network
+    restart: unless-stopped
+
+volumes:
+  mysql-data:
+  redis-data:
+
+networks:
+  kiteserver-network:
+    driver: bridge

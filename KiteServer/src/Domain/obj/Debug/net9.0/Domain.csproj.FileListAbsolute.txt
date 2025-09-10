@@ -1,0 +1,16 @@
+D:\Code\GitHubCode\KiteFrame\KiteServer\src\Domain\obj\Debug\net9.0\Domain.csproj.AssemblyReference.cache
+D:\Code\GitHubCode\KiteFrame\KiteServer\src\Domain\obj\Debug\net9.0\Domain.GeneratedMSBuildEditorConfig.editorconfig
+D:\Code\GitHubCode\KiteFrame\KiteServer\src\Domain\obj\Debug\net9.0\Domain.AssemblyInfoInputs.cache
+D:\Code\GitHubCode\KiteFrame\KiteServer\src\Domain\obj\Debug\net9.0\Domain.AssemblyInfo.cs
+D:\Code\GitHubCode\KiteFrame\KiteServer\src\Domain\obj\Debug\net9.0\Domain.csproj.CoreCompileInputs.cache
+D:\Code\GitHubCode\KiteFrame\KiteServer\src\Domain\obj\Debug\net9.0\Domain.sourcelink.json
+D:\Code\GitHubCode\KiteFrame\KiteServer\src\Domain\bin\Debug\net9.0\Domain.deps.json
+D:\Code\GitHubCode\KiteFrame\KiteServer\src\Domain\bin\Debug\net9.0\Domain.dll
+D:\Code\GitHubCode\KiteFrame\KiteServer\src\Domain\bin\Debug\net9.0\Domain.pdb
+D:\Code\GitHubCode\KiteFrame\KiteServer\src\Domain\bin\Debug\net9.0\Shared.dll
+D:\Code\GitHubCode\KiteFrame\KiteServer\src\Domain\bin\Debug\net9.0\Shared.pdb
+D:\Code\GitHubCode\KiteFrame\KiteServer\src\Domain\obj\Debug\net9.0\Domain.csproj.Up2Date
+D:\Code\GitHubCode\KiteFrame\KiteServer\src\Domain\obj\Debug\net9.0\Domain.dll
+D:\Code\GitHubCode\KiteFrame\KiteServer\src\Domain\obj\Debug\net9.0\refint\Domain.dll
+D:\Code\GitHubCode\KiteFrame\KiteServer\src\Domain\obj\Debug\net9.0\Domain.pdb
+D:\Code\GitHubCode\KiteFrame\KiteServer\src\Domain\obj\Debug\net9.0\ref\Domain.dll
