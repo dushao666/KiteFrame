@@ -84,28 +84,56 @@ public static class SwaggerExtensions
                 });
             }
 
+            // 自定义 OperationId
+            options.CustomOperationIds(apiDesc =>
+            {
+                if (apiDesc.ActionDescriptor is ControllerActionDescriptor controllerAction)
+                {
+                    return $"{controllerAction.ControllerName}_{controllerAction.ActionName}";
+                }
+                return apiDesc.ActionDescriptor.DisplayName;
+            });
+
             // XML 注释配置
             if (swaggerSettings.EnableXmlComments)
             {
-                // 自动查找 XML 注释文件
+                // 优先使用 SwaggerXml 目录中的 XML 文件
+                var swaggerXmlPath = Path.Combine(AppContext.BaseDirectory, "SwaggerXml");
                 var xmlFiles = new List<string>();
-                
-                // 添加当前程序集的 XML 文件
-                var currentAssembly = Assembly.GetExecutingAssembly();
-                var currentXmlFile = Path.Combine(AppContext.BaseDirectory, $"{currentAssembly.GetName().Name}.xml");
-                if (File.Exists(currentXmlFile))
-                {
-                    xmlFiles.Add(currentXmlFile);
-                }
 
-                // 添加引用程序集的 XML 文件
-                var referencedAssemblies = new[] { "Application", "Domain", "Shared" };
-                foreach (var assemblyName in referencedAssemblies)
+                if (Directory.Exists(swaggerXmlPath))
                 {
-                    var xmlFile = Path.Combine(AppContext.BaseDirectory, $"{assemblyName}.xml");
-                    if (File.Exists(xmlFile))
+                    // 添加 SwaggerXml 目录中的 XML 文件
+                    var swaggerXmlFiles = new[] { "api.xml", "application.xml", "domain.xml", "shared.xml" };
+                    foreach (var xmlFileName in swaggerXmlFiles)
                     {
-                        xmlFiles.Add(xmlFile);
+                        var xmlFile = Path.Combine(swaggerXmlPath, xmlFileName);
+                        if (File.Exists(xmlFile))
+                        {
+                            xmlFiles.Add(xmlFile);
+                        }
+                    }
+                }
+                else
+                {
+                    // 回退到自动查找 XML 注释文件
+                    // 添加当前程序集的 XML 文件
+                    var currentAssembly = Assembly.GetExecutingAssembly();
+                    var currentXmlFile = Path.Combine(AppContext.BaseDirectory, $"{currentAssembly.GetName().Name}.xml");
+                    if (File.Exists(currentXmlFile))
+                    {
+                        xmlFiles.Add(currentXmlFile);
+                    }
+
+                    // 添加引用程序集的 XML 文件
+                    var referencedAssemblies = new[] { "Application", "Domain", "Shared" };
+                    foreach (var assemblyName in referencedAssemblies)
+                    {
+                        var xmlFile = Path.Combine(AppContext.BaseDirectory, $"{assemblyName}.xml");
+                        if (File.Exists(xmlFile))
+                        {
+                            xmlFiles.Add(xmlFile);
+                        }
                     }
                 }
 

@@ -1,5 +1,3 @@
-using Api.Extensions;
-
 // 配置 Serilog
 ProgramExtensions.ConfigureSerilog();
 

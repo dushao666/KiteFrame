@@ -13,7 +13,7 @@ global using System.ComponentModel.DataAnnotations;
 // Microsoft Extensions (只引用在类库项目中可用的)
 // global using Microsoft.Extensions.Configuration;
 // global using Microsoft.Extensions.DependencyInjection;
-// global using Microsoft.Extensions.Logging;
+global using Microsoft.Extensions.Logging;
 // global using Microsoft.Extensions.Options;
 
 // MediatR
@@ -32,5 +32,6 @@ global using Shared.Enums;
 global using Shared.Models;
 global using Domain.Entities.Base;
 global using Domain.Interfaces;
+// global using Infrastructure.Data;
 global using Application.Common.Interfaces;
 global using Application.Common.Models;

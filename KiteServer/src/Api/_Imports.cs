@@ -14,6 +14,7 @@ global using System.Reflection;
 global using IGeekFan.AspNetCore.Knife4jUI;
 // ASP.NET Core
 global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.AspNetCore.Mvc.Controllers;
 global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
 
@@ -31,9 +32,6 @@ global using Microsoft.Extensions.Options;
 
 // MediatR
 global using MediatR;
-
-// Swagger
-global using Swashbuckle.AspNetCore.Annotations;
 
 // 项目特定命名空间
 global using Shared.Configuration;

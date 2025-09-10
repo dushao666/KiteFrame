@@ -1,9 +1,11 @@
+using Domain.Interfaces;
+
 namespace Domain.Entities.Base;
 
 /// <summary>
 /// 基础实体类
 /// </summary>
-public abstract class BaseEntity
+public abstract class BaseEntity : IDeleted
 {
     /// <summary>
     /// 主键ID

@@ -35,5 +35,4 @@ global using Shared.Models;
 global using Domain.Entities.Base;
 global using Domain.Interfaces;
 global using Application.Common.Interfaces;
-global using Infrastructure.Data;
 global using Infrastructure.Services;
