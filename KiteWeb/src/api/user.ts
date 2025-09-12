@@ -1,45 +1,86 @@
 import { http } from "@/utils/http";
 
-export type UserResult = {
+// 后台API返回的统一结果格式
+export type ApiResult<T = any> = {
   success: boolean;
-  data: {
-    /** 头像 */
-    avatar: string;
-    /** 用户名 */
-    username: string;
-    /** 昵称 */
-    nickname: string;
-    /** 当前登录用户的角色 */
-    roles: Array<string>;
-    /** 按钮级别权限 */
-    permissions: Array<string>;
-    /** `token` */
-    accessToken: string;
-    /** 用于调用刷新`accessToken`的接口时所需的`token` */
-    refreshToken: string;
-    /** `accessToken`的过期时间（格式'xxxx/xx/xx xx:xx:xx'） */
-    expires: Date;
-  };
+  message: string;
+  data: T;
+  code: number;
+  timestamp: string;
 };
 
-export type RefreshTokenResult = {
-  success: boolean;
-  data: {
-    /** `token` */
-    accessToken: string;
-    /** 用于调用刷新`accessToken`的接口时所需的`token` */
-    refreshToken: string;
-    /** `accessToken`的过期时间（格式'xxxx/xx/xx xx:xx:xx'） */
-    expires: Date;
-  };
+// 登录用户信息
+export type LoginUserData = {
+  /** 用户ID */
+  userId: number;
+  /** 用户名 */
+  userName: string;
+  /** 真实姓名 */
+  realName?: string;
+  /** 邮箱 */
+  email?: string;
+  /** 手机号 */
+  phone?: string;
+  /** 头像 */
+  avatar?: string;
+  /** 访问令牌 */
+  accessToken: string;
+  /** 刷新令牌 */
+  refreshToken: string;
+  /** 令牌过期时间 */
+  expiresAt: string;
+  /** 最后登录时间 */
+  lastLoginTime?: string;
+  /** 最后登录IP */
+  lastLoginIp?: string;
+};
+
+export type UserResult = ApiResult<LoginUserData>;
+
+// 刷新令牌数据
+export type RefreshTokenData = {
+  /** 访问令牌 */
+  accessToken: string;
+  /** 刷新令牌 */
+  refreshToken: string;
+  /** 令牌过期时间 */
+  expiresAt: string;
+};
+
+export type RefreshTokenResult = ApiResult<RefreshTokenData>;
+
+// 登录请求参数
+export type LoginRequest = {
+  /** 登录类型 */
+  type?: number;
+  /** 用户名 */
+  userName?: string;
+  /** 密码 */
+  password?: string;
+  /** 手机号 */
+  phone?: string;
+  /** 短信验证码 */
+  smsCode?: string;
+  /** 记住我 */
+  rememberMe?: boolean;
+};
+
+// 刷新令牌请求参数
+export type RefreshTokenRequest = {
+  refreshToken: string;
 };
 
 /** 登录 */
-export const getLogin = (data?: object) => {
-  return http.request<UserResult>("post", "/login", { data });
+export const getLogin = (data: LoginRequest) => {
+  return http.request<UserResult>("post", "/auth/signin", { data });
 };
 
 /** 刷新`token` */
-export const refreshTokenApi = (data?: object) => {
-  return http.request<RefreshTokenResult>("post", "/refresh-token", { data });
+export const refreshTokenApi = (data: RefreshTokenRequest) => {
+  return http.request<RefreshTokenResult>("post", "/auth/refresh", { data });
+};
+
+/** 登出 */
+export const logout = () => {
+  return http.request<ApiResult>("post", "/auth/signout");
 };

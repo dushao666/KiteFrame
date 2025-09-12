@@ -16,6 +16,8 @@ import { useUserStoreHook } from "@/store/modules/user";
 
 // 相关配置请参考：www.axios-js.com/zh-cn/docs/#axios-request-config-1
 const defaultConfig: AxiosRequestConfig = {
+  // API基础地址
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api",
   // 请求超时时间
   timeout: 10000,
   headers: {
@@ -73,7 +75,7 @@ class PureHttp {
           return config;
         }
         /** 请求白名单，放置一些不需要`token`的接口（通过设置请求白名单，防止`token`过期后再请求造成的死循环问题） */
-        const whiteList = ["/refresh-token", "/login"];
+        const whiteList = ["/auth/refresh", "/auth/signin"];
         return whiteList.some(url => config.url.endsWith(url))
           ? config
           : new Promise(resolve => {

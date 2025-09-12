@@ -45,7 +45,7 @@ const { locale, translationCh, translationEn } = useTranslationLang();
 
 const ruleForm = reactive({
   username: "admin",
-  password: "admin123"
+  password: "123456"
 });
 
 const onLogin = async (formEl: FormInstance | undefined) => {
@@ -55,8 +55,9 @@ const onLogin = async (formEl: FormInstance | undefined) => {
       loading.value = true;
       useUserStoreHook()
         .loginByUsername({
-          username: ruleForm.username,
-          password: ruleForm.password
+          userName: ruleForm.username,
+          password: ruleForm.password,
+          type: 1 // 密码登录 (LoginType.Password = 1)
         })
         .then(res => {
           if (res.success) {
@@ -71,8 +72,21 @@ const onLogin = async (formEl: FormInstance | undefined) => {
                 .finally(() => (disabled.value = false));
             });
           } else {
-            message(t("login.pureLoginFail"), { type: "error" });
+            message(res.message || t("login.pureLoginFail"), { type: "error" });
           }
+        })
+        .catch(error => {
+          console.error("登录错误:", error);
+          let errorMessage = t("login.pureLoginFail");
+
+          // 处理不同类型的错误
+          if (error?.response?.data?.message) {
+            errorMessage = error.response.data.message;
+          } else if (error?.message) {
+            errorMessage = error.message;
+          }
+
+          message(errorMessage, { type: "error" });
         })
         .finally(() => (loading.value = false));
     }

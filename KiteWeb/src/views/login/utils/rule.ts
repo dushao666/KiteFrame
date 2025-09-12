@@ -10,15 +10,8 @@ export const REGEXP_PWD =
 const loginRules = reactive<FormRules>({
   password: [
     {
-      validator: (rule, value, callback) => {
-        if (value === "") {
-          callback(new Error(transformI18n($t("login.purePassWordReg"))));
-        } else if (!REGEXP_PWD.test(value)) {
-          callback(new Error(transformI18n($t("login.purePassWordRuleReg"))));
-        } else {
-          callback();
-        }
-      },
+      required: true,
+      message: transformI18n($t("login.purePassWordReg")),
       trigger: "blur"
     }
   ]

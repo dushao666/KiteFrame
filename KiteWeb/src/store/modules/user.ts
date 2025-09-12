@@ -10,11 +10,14 @@ import {
 import {
   type UserResult,
   type RefreshTokenResult,
+  type LoginRequest,
+  type RefreshTokenRequest,
   getLogin,
-  refreshTokenApi
+  refreshTokenApi,
+  logout
 } from "@/api/user";
 import { useMultiTagsStoreHook } from "./multiTags";
-import { type DataInfo, setToken, removeToken, userKey } from "@/utils/auth";
+import { type DataInfo, setToken, removeToken, getToken, userKey } from "@/utils/auth";
 
 export const useUserStore = defineStore("pure-user", {
   state: (): userType => ({
@@ -64,36 +67,72 @@ export const useUserStore = defineStore("pure-user", {
       this.loginDay = Number(value);
     },
     /** 登入 */
-    async loginByUsername(data) {
+    async loginByUsername(data: LoginRequest) {
       return new Promise<UserResult>((resolve, reject) => {
         getLogin(data)
-          .then(data => {
-            if (data?.success) setToken(data.data);
-            resolve(data);
+          .then(response => {
+            if (response?.success && response.data) {
+              // 设置token到本地存储
+              setToken({
+                accessToken: response.data.accessToken,
+                refreshToken: response.data.refreshToken,
+                expires: new Date(response.data.expiresAt).getTime().toString(),
+                username: response.data.userName,
+                nickname: response.data.realName || response.data.userName,
+                avatar: response.data.avatar || "",
+                roles: [], // 后续从权限接口获取
+                permissions: [] // 后续从权限接口获取
+              });
+
+              // 更新store状态
+              this.SET_USERNAME(response.data.userName);
+              this.SET_NICKNAME(response.data.realName || response.data.userName);
+              this.SET_AVATAR(response.data.avatar || "");
+            }
+            resolve(response);
           })
           .catch(error => {
             reject(error);
           });
       });
     },
-    /** 前端登出（不调用接口） */
-    logOut() {
-      this.username = "";
-      this.roles = [];
-      this.permissions = [];
-      removeToken();
-      useMultiTagsStoreHook().handleTags("equal", [...routerArrays]);
-      resetRouter();
-      router.push("/login");
+    /** 登出 */
+    async logOut() {
+      try {
+        // 调用后台登出接口
+        await logout();
+      } catch (error) {
+        console.warn("登出接口调用失败:", error);
+      } finally {
+        // 清理本地状态
+        this.username = "";
+        this.nickname = "";
+        this.avatar = "";
+        this.roles = [];
+        this.permissions = [];
+        removeToken();
+        useMultiTagsStoreHook().handleTags("equal", [...routerArrays]);
+        resetRouter();
+        router.push("/login");
+      }
     },
     /** 刷新`token` */
-    async handRefreshToken(data) {
+    async handRefreshToken(data: RefreshTokenRequest) {
       return new Promise<RefreshTokenResult>((resolve, reject) => {
         refreshTokenApi(data)
-          .then(data => {
-            if (data) {
-              setToken(data.data);
-              resolve(data);
+          .then(response => {
+            if (response?.success && response.data) {
+              // 更新token
+              const currentToken = getToken();
+              if (currentToken) {
+                setToken({
+                  ...currentToken,
+                  accessToken: response.data.accessToken,
+                  refreshToken: response.data.refreshToken,
+                  expires: new Date(response.data.expiresAt).getTime().toString()
+                });
+              }
+              resolve(response);
             }
           })
           .catch(error => {
