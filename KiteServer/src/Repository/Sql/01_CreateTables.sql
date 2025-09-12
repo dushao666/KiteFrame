@@ -19,7 +19,7 @@ DROP TABLE IF EXISTS `sys_user`;
 CREATE TABLE `sys_user` (
   `Id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `UserName` varchar(50) NOT NULL COMMENT '用户名',
-  `Password` varchar(100) NOT NULL COMMENT '密码',
+  `Password` varchar(200) NOT NULL COMMENT '密码',
   `Email` varchar(100) DEFAULT NULL COMMENT '邮箱',
   `Phone` varchar(20) DEFAULT NULL COMMENT '手机号',
   `RealName` varchar(50) DEFAULT NULL COMMENT '真实姓名',
@@ -50,20 +50,20 @@ CREATE TABLE `sys_user` (
 -- 插入默认管理员用户
 -- =============================================
 INSERT INTO `sys_user` (
-  `UserName`, 
-  `Password`, 
-  `Email`, 
-  `RealName`, 
-  `Status`, 
+  `UserName`,
+  `Password`,
+  `Email`,
+  `RealName`,
+  `Status`,
   `Remark`,
   `CreateTime`,
   `UpdateTime`
 ) VALUES (
-  'admin', 
-  'e10adc3949ba59abbe56e057f20f883e', -- 密码: 123456 (MD5加密)
-  'admin@kiteserver.com', 
-  '系统管理员', 
-  1, 
+  'admin',
+  'ba3253876aed6bc22d4a6ff53d8406c6ad864195ed144ab5c87621b6c233b548baeae6956df346ec8c17f5ea10f35ee3cbc514797ed7ddd3145464e2a0bab413', -- 密码: 123456 (SHA512加密)
+  'admin@kiteserver.com',
+  '系统管理员',
+  1,
   '系统默认管理员账户',
   NOW(),
   NOW()
@@ -80,7 +80,7 @@ DROP TABLE IF EXISTS `sys_user`;
 CREATE TABLE `sys_user` (
   `Id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `UserName` varchar(50) NOT NULL COMMENT '用户名',
-  `Password` varchar(100) NOT NULL COMMENT '密码',
+  `Password` varchar(200) NOT NULL COMMENT '密码',
   `Email` varchar(100) DEFAULT NULL COMMENT '邮箱',
   `Phone` varchar(20) DEFAULT NULL COMMENT '手机号',
   `RealName` varchar(50) DEFAULT NULL COMMENT '真实姓名',
@@ -107,20 +107,20 @@ CREATE TABLE `sys_user` (
 
 -- 插入默认管理员用户 - 生产环境
 INSERT INTO `sys_user` (
-  `UserName`, 
-  `Password`, 
-  `Email`, 
-  `RealName`, 
-  `Status`, 
+  `UserName`,
+  `Password`,
+  `Email`,
+  `RealName`,
+  `Status`,
   `Remark`,
   `CreateTime`,
   `UpdateTime`
 ) VALUES (
-  'admin', 
-  'e10adc3949ba59abbe56e057f20f883e', -- 密码: 123456 (MD5加密)
-  'admin@kiteserver.com', 
-  '系统管理员', 
-  1, 
+  'admin',
+  'ba3253876aed6bc22d4a6ff53d8406c6ad864195ed144ab5c87621b6c233b548baeae6956df346ec8c17f5ea10f35ee3cbc514797ed7ddd3145464e2a0bab413', -- 密码: 123456 (SHA512加密)
+  'admin@kiteserver.com',
+  '系统管理员',
+  1,
   '系统默认管理员账户',
   NOW(),
   NOW()
