@@ -1,7 +1,8 @@
 
 using Repository.Extensions;
-using Mapster;
 using Application.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Api.Extensions;
 
@@ -47,6 +48,9 @@ public static class ProgramExtensions
 
         // 添加 MediatR
         builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Application.Commands.User.CreateUserCommand).Assembly));
+
+        // 添加 JWT 认证
+        builder.Services.AddJwtAuthentication(builder.Configuration);
 
         // 添加控制器
         builder.Services.AddControllers();
@@ -155,7 +159,69 @@ public static class ProgramExtensions
         return app;
     }
 
+    /// <summary>
+    /// 添加 JWT 认证服务
+    /// </summary>
+    /// <param name="services">服务集合</param>
+    /// <param name="configuration">配置</param>
+    /// <returns></returns>
+    private static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
+    {
+        var jwtSettings = configuration.GetSection("JwtSettings");
+        var secretKey = jwtSettings["SecretKey"];
 
+        if (string.IsNullOrEmpty(secretKey))
+        {
+            throw new InvalidOperationException("JWT SecretKey 未配置");
+        }
+
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.SaveToken = true;
+            options.RequireHttpsMetadata = false;
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = "KiteServer",
+                ValidAudience = "KiteClient",
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+                ClockSkew = TimeSpan.Zero
+            };
+
+            // 配置JWT事件
+            options.Events = new JwtBearerEvents
+            {
+                OnAuthenticationFailed = context =>
+                {
+                    Log.Warning("JWT认证失败: {Message}", context.Exception.Message);
+                    return Task.CompletedTask;
+                },
+                OnTokenValidated = context =>
+                {
+                    Log.Debug("JWT令牌验证成功: {UserId}", context.Principal?.Identity?.Name);
+                    return Task.CompletedTask;
+                },
+                OnChallenge = context =>
+                {
+                    Log.Warning("JWT认证质询: {Error}", context.Error);
+                    return Task.CompletedTask;
+                }
+            };
+        });
+
+        services.AddAuthorization();
+
+        return services;
+    }
 
     /// <summary>
     /// 运行应用程序并处理异常

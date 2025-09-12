@@ -35,4 +35,13 @@ global using MediatR;
 
 // 项目特定命名空间
 global using Shared.Configuration;
+global using Shared.Models;
+global using Shared.Models.Dtos;
+global using Shared.Enums;
+global using Application.Commands.Auth;
+global using Infrastructure.Exceptions;
 global using Api.Extensions;
+global using System.Security.Claims;
+global using Application.Commands.User;
+global using Application.Queries.User;
+global using Shared.Models.User;

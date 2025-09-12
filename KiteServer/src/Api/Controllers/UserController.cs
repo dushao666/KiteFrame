@@ -1,9 +1,3 @@
-using Application.Commands.User;
-using Application.Queries.User;
-using Microsoft.AspNetCore.Mvc;
-using Shared.Models;
-using Shared.Models.User;
-
 namespace Api.Controllers;
 
 /// <summary>

@@ -23,4 +23,10 @@ global using Mapster;
 
 // 项目特定命名空间
 global using Shared.Models;
+global using Shared.Models.Dtos;
+global using Shared.Enums;
+global using Domain.Entities;
+global using Repository;
+global using Infrastructure.Exceptions;
+global using Infrastructure.Utilities;
 // global using Infrastructure.Data;
