@@ -151,6 +151,47 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
+    /// 发送短信验证码
+    /// </summary>
+    /// <param name="command">发送短信验证码命令</param>
+    /// <returns>发送结果</returns>
+    [HttpPost("send-sms-code")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(ApiResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> SendSmsCodeAsync([FromBody] Application.Commands.Auth.SendSmsCodeCommand command)
+    {
+        try
+        {
+            // 获取客户端IP地址
+            command.ClientIp = GetClientIpAddress();
+
+            var result = await _mediator.Send(command);
+
+            if (result)
+            {
+                _logger.LogInformation("短信验证码发送成功，手机号: {Phone}", command.Phone);
+                return Ok(ApiResult.Ok("验证码发送成功"));
+            }
+            else
+            {
+                return BadRequest(ApiResult.Fail("验证码发送失败，请稍后重试"));
+            }
+        }
+        catch (BusinessException ex)
+        {
+            _logger.LogWarning("发送短信验证码失败: {Message}", ex.Message);
+            return BadRequest(ApiResult.Fail(ex.Message));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "发送短信验证码异常");
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                ApiResult.Fail("发送验证码失败，请稍后重试"));
+        }
+    }
+
+    /// <summary>
     /// 修改密码
     /// </summary>
     /// <param name="oldPassword">旧密码</param>

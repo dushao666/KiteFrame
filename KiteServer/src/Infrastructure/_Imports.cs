@@ -26,6 +26,17 @@ global using SqlSugar;
 // 缓存
 global using Microsoft.Extensions.Caching.Memory;
 global using Microsoft.Extensions.Caching.Distributed;
+global using Microsoft.Extensions.Caching.StackExchangeRedis;
+
+// Redis
+global using StackExchange.Redis;
+
+// 并发集合
+global using System.Collections.Concurrent;
+
+// 项目引用
+global using Shared.Configuration;
+global using Infrastructure.Services;
 
 // 项目特定命名空间
 global using Infrastructure.Services;

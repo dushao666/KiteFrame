@@ -9,6 +9,7 @@ global using System.Threading;
 global using System.Threading.Tasks;
 global using System.ComponentModel;
 global using System.ComponentModel.DataAnnotations;
+global using System.Text;
 global using Microsoft.OpenApi.Models;
 global using System.Reflection;
 global using IGeekFan.AspNetCore.Knife4jUI;
@@ -39,8 +40,14 @@ global using Shared.Models;
 global using Shared.Models.Dtos;
 global using Shared.Enums;
 global using Application.Commands.Auth;
+global using Application.DependencyInjection;
+global using Repository.Extensions;
+global using Infrastructure.Extensions;
 global using Infrastructure.Exceptions;
 global using Api.Extensions;
+
+// JWT
+global using Microsoft.IdentityModel.Tokens;
 global using System.Security.Claims;
 global using Application.Commands.User;
 global using Application.Queries.User;

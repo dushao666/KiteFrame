@@ -7,12 +7,13 @@ global using System.Collections.Generic;
 global using System.Linq;
 global using System.Threading;
 global using System.Threading.Tasks;
+global using System.Security.Claims;
 
 // Microsoft Extensions (只引用在类库项目中可用的)
-// global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.Configuration;
 // global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Logging;
-// global using Microsoft.Extensions.Options;
+global using Microsoft.Extensions.Options;
 
 // MediatR
 global using MediatR;
@@ -27,6 +28,14 @@ global using Shared.Models.Dtos;
 global using Shared.Enums;
 global using Domain.Entities;
 global using Repository;
+global using SqlSugar;
 global using Infrastructure.Exceptions;
 global using Infrastructure.Utilities;
-// global using Infrastructure.Data;
+global using Infrastructure.Services;
+global using Infrastructure.Extensions;
+
+// Application 命名空间
+global using Application.Commands.Auth;
+
+// 数据注解
+global using System.ComponentModel.DataAnnotations;

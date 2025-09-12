@@ -2,13 +2,14 @@
 
   <ItemGroup>
     <!-- SqlSugar ORM -->
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.9" />
     <PackageReference Include="SqlSugar" Version="5.1.4.157" />
 
     <!-- MySQL 驱动 -->
     <PackageReference Include="MySql.Data" Version="8.4.0" />
 
     <!-- Redis 缓存 -->
-    <PackageReference Include="StackExchange.Redis" Version="2.8.16" />
+    <PackageReference Include="StackExchange.Redis" Version="2.9.17" />
 
     <!-- 日志 -->
     <PackageReference Include="Serilog" Version="4.1.0" />

@@ -32,7 +32,7 @@ public static class ApplicationServiceExtensions
     /// <returns></returns>
     private static IServiceCollection AddQueryServices(this IServiceCollection services)
     {
-        // 自动扫描注册查询服务（推荐方式）
+        // 自动扫描注册查询服务
         RegisterQueriesByConvention(services);
 
         return services;

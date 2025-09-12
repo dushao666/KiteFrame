@@ -1,9 +1,4 @@
 
-using Repository.Extensions;
-using Application.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-
 namespace Api.Extensions;
 
 /// <summary>
@@ -42,6 +37,9 @@ public static class ProgramExtensions
 
         // 添加数据库服务
         builder.Services.AddCustomDatabase(builder.Configuration);
+
+        // 添加缓存服务
+        builder.Services.AddCacheServices(builder.Configuration);
 
         // 添加应用层服务（包括查询服务、Mapster配置等）
         builder.Services.AddApplicationServices();

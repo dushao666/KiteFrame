@@ -1,7 +1,3 @@
-using MediatR;
-using Shared.Enums;
-using Shared.Models.Dtos;
-
 namespace Application.Commands.Auth;
 
 /// <summary>

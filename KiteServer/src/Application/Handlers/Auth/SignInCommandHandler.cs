@@ -1,13 +1,3 @@
-using Application.Commands.Auth;
-using Domain.Entities;
-using MediatR;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Shared.Enums;
-using Shared.Models.Dtos;
-using SqlSugar;
-using System.Security.Claims;
-
 namespace Application.Handlers.Auth;
 
 /// <summary>
@@ -15,18 +5,21 @@ namespace Application.Handlers.Auth;
 /// </summary>
 public class SignInCommandHandler : IRequestHandler<SignInCommand, LoginUserDto>
 {
-    private readonly ISugarUnitOfWork<Repository.DBContext> _unitOfWork;
+    private readonly ISugarUnitOfWork<DBContext> _unitOfWork;
     private readonly IConfiguration _configuration;
     private readonly ILogger<SignInCommandHandler> _logger;
+    private readonly Infrastructure.Services.ICacheService _cacheService;
 
     public SignInCommandHandler(
-        ISugarUnitOfWork<Repository.DBContext> unitOfWork,
+        ISugarUnitOfWork<DBContext> unitOfWork,
         IConfiguration configuration,
-        ILogger<SignInCommandHandler> logger)
+        ILogger<SignInCommandHandler> logger,
+        Infrastructure.Services.ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
         _configuration = configuration;
         _logger = logger;
+        _cacheService = cacheService;
     }
 
     public async Task<LoginUserDto> Handle(SignInCommand request, CancellationToken cancellationToken)
@@ -104,8 +97,22 @@ public class SignInCommandHandler : IRequestHandler<SignInCommand, LoginUserDto>
     /// </summary>
     private async Task<Domain.Entities.User?> HandleSmsCodeLogin(SignInCommand request)
     {
-        // TODO: 验证短信验证码
-        // 这里应该从缓存中验证验证码是否正确
+        // 验证短信验证码
+        var smsCodeCacheKey = CacheServiceExtensions.GenerateCacheKey("sms_code", request.Phone!);
+        var cachedSmsCode = await _cacheService.GetAsync<string>(smsCodeCacheKey);
+
+        if (string.IsNullOrEmpty(cachedSmsCode))
+        {
+            throw new BusinessException("验证码已过期，请重新获取");
+        }
+
+        if (cachedSmsCode != request.SmsCode)
+        {
+            throw new BusinessException("验证码错误");
+        }
+
+        // 验证成功后删除验证码缓存
+        await _cacheService.RemoveAsync(smsCodeCacheKey);
 
         using var context = _unitOfWork.CreateContext(false);
 
@@ -192,7 +199,24 @@ public class SignInCommandHandler : IRequestHandler<SignInCommand, LoginUserDto>
         // 生成刷新令牌
         var refreshToken = Infrastructure.Utilities.JwtHelper.GenerateRefreshToken();
 
-        // TODO: 将刷新令牌存储到缓存中，用于后续刷新访问令牌
+        // 将刷新令牌存储到缓存中，用于后续刷新访问令牌
+        var refreshTokenCacheKey = CacheServiceExtensions.GenerateTokenCacheKey(user.Id, "refresh_token");
+        var refreshTokenExpiry = TimeSpan.FromDays(refreshTokenExpiryDays);
+        await _cacheService.SetAsync(refreshTokenCacheKey, refreshToken, refreshTokenExpiry);
+
+        // 存储用户会话信息到缓存
+        var sessionCacheKey = CacheServiceExtensions.GenerateSessionCacheKey(user.Id, refreshToken);
+        var sessionInfo = new
+        {
+            UserId = user.Id,
+            UserName = user.UserName,
+            LoginTime = DateTime.UtcNow,
+            ClientIp = user.LastLoginIp,
+            ExpiresAt = expiresAt
+        };
+        await _cacheService.SetAsync(sessionCacheKey, sessionInfo, refreshTokenExpiry);
+
+        _logger.LogDebug("用户 {UserId} 的令牌已缓存，过期时间: {ExpiresAt}", user.Id, expiresAt);
 
         return new LoginUserDto
         {
