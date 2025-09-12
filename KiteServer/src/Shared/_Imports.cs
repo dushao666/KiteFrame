@@ -16,4 +16,3 @@ global using System.ComponentModel.DataAnnotations;
 global using Shared.Configuration;
 global using Shared.Constants;
 global using Shared.Enums;
-global using Shared.Extensions;

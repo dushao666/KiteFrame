@@ -35,9 +35,4 @@ global using MediatR;
 
 // 项目特定命名空间
 global using Shared.Configuration;
-global using Shared.Constants;
-global using Shared.Enums;
-global using Domain.Entities;
-global using Application.Common.Interfaces;
-global using Application.Common.Models;
 global using Api.Extensions;

@@ -7,8 +7,6 @@ global using System.Collections.Generic;
 global using System.Linq;
 global using System.Threading;
 global using System.Threading.Tasks;
-global using System.ComponentModel;
-global using System.ComponentModel.DataAnnotations;
 
 // Microsoft Extensions (只引用在类库项目中可用的)
 // global using Microsoft.Extensions.Configuration;
@@ -19,19 +17,10 @@ global using Microsoft.Extensions.Logging;
 // MediatR
 global using MediatR;
 
-// AutoMapper
-global using AutoMapper;
+// Mapster
+global using Mapster;
 
-// FluentValidation
-global using FluentValidation;
 
 // 项目特定命名空间
-global using Shared.Configuration;
-global using Shared.Constants;
-global using Shared.Enums;
 global using Shared.Models;
-global using Domain.Entities.Base;
-global using Domain.Interfaces;
 // global using Infrastructure.Data;
-global using Application.Common.Interfaces;
-global using Application.Common.Models;

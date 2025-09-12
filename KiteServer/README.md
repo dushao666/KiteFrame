@@ -11,7 +11,7 @@
 - **Redis** - 缓存和会话存储
 - **Serilog** - 结构化日志
 - **JWT** - 身份认证
-- **AutoMapper** - 对象映射
+- **Mapster** - 对象映射
 - **FluentValidation** - 数据验证
 - **MediatR** - CQRS 模式
 

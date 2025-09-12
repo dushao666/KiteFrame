@@ -1,5 +1,7 @@
 
 using Repository.Extensions;
+using Mapster;
+using Application.DependencyInjection;
 
 namespace Api.Extensions;
 
@@ -40,11 +42,11 @@ public static class ProgramExtensions
         // 添加数据库服务
         builder.Services.AddCustomDatabase(builder.Configuration);
 
+        // 添加应用层服务（包括查询服务、Mapster配置等）
+        builder.Services.AddApplicationServices();
+
         // 添加 MediatR
         builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Application.Commands.User.CreateUserCommand).Assembly));
-
-        // 添加查询服务
-        builder.Services.AddScoped<Application.Queries.User.IUserQueries, Application.Queries.User.UserQueries>();
 
         // 添加控制器
         builder.Services.AddControllers();
@@ -152,6 +154,8 @@ public static class ProgramExtensions
 
         return app;
     }
+
+
 
     /// <summary>
     /// 运行应用程序并处理异常

@@ -39,23 +39,13 @@ public class UserQueries : IUserQueries
                 }
 
                 var totalCount = await query.CountAsync();
-                var items = await query.OrderByDescending(x => x.CreateTime)
+                var users = await query.OrderByDescending(x => x.CreateTime)
                     .Skip((request.PageIndex - 1) * request.PageSize)
                     .Take(request.PageSize)
-                    .Select(x => new UserDto
-                    {
-                        Id = x.Id,
-                        UserName = x.UserName,
-                        Email = x.Email,
-                        Phone = x.Phone,
-                        RealName = x.RealName,
-                        DingTalkId = x.DingTalkId,
-                        Status = x.Status,
-                        Remark = x.Remark,
-                        CreateTime = x.CreateTime,
-                        UpdateTime = x.UpdateTime
-                    })
                     .ToListAsync();
+
+                // 使用Mapster进行对象映射
+                var items = users.Adapt<List<UserDto>>();
                 
                 var result = new PagedResult<UserDto>
                 {
@@ -92,19 +82,8 @@ public class UserQueries : IUserQueries
                     return ApiResult<UserDto>.Fail("用户不存在");
                 }
 
-                var userDto = new UserDto
-                {
-                    Id = user.Id,
-                    UserName = user.UserName,
-                    Email = user.Email,
-                    Phone = user.Phone,
-                    RealName = user.RealName,
-                    DingTalkId = user.DingTalkId,
-                    Status = user.Status,
-                    Remark = user.Remark,
-                    CreateTime = user.CreateTime,
-                    UpdateTime = user.UpdateTime
-                };
+                // 使用Mapster进行对象映射
+                var userDto = user.Adapt<UserDto>();
 
                 return ApiResult<UserDto>.Ok(userDto, "获取成功");
             }

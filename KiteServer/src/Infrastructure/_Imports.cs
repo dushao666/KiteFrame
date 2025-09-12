@@ -28,11 +28,9 @@ global using Microsoft.Extensions.Caching.Memory;
 global using Microsoft.Extensions.Caching.Distributed;
 
 // 项目特定命名空间
-global using Shared.Configuration;
-global using Shared.Constants;
-global using Shared.Enums;
-global using Shared.Models;
-global using Domain.Entities.Base;
-global using Domain.Interfaces;
-global using Application.Common.Interfaces;
 global using Infrastructure.Services;
+
+// Infrastructure 扩展方法和工具类
+global using Infrastructure.Extensions;
+global using Infrastructure.Utilities;
+global using Infrastructure.Exceptions;

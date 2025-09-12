@@ -36,17 +36,8 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, ApiRe
                     return ApiResult<long>.Fail("用户名已存在");
                 }
 
-                var user = new Domain.Entities.User
-                {
-                    UserName = request.UserName,
-                    Password = request.Password, // 实际项目中应该加密
-                    Email = request.Email,
-                    Phone = request.Phone,
-                    RealName = request.RealName,
-                    DingTalkId = request.DingTalkId,
-                    Status = request.Status,
-                    Remark = request.Remark
-                };
+                // 使用Mapster进行对象映射
+                var user = request.Adapt<Domain.Entities.User>();
 
                 var result = await context.Users.InsertReturnEntityAsync(user);
                 context.Commit();
