@@ -188,7 +188,7 @@ public class SignInCommandHandler : IRequestHandler<SignInCommand, LoginUserDto>
         };
 
         // 生成访问令牌
-        var accessToken = Infrastructure.Utilities.JwtHelper.GenerateToken(
+        var accessToken = JwtHelper.GenerateToken(
             claims,
             secretKey,
             "KiteServer",
@@ -197,7 +197,7 @@ public class SignInCommandHandler : IRequestHandler<SignInCommand, LoginUserDto>
         );
 
         // 生成刷新令牌
-        var refreshToken = Infrastructure.Utilities.JwtHelper.GenerateRefreshToken();
+        var refreshToken = JwtHelper.GenerateRefreshToken();
 
         // 将刷新令牌存储到缓存中，用于后续刷新访问令牌
         var refreshTokenCacheKey = CacheServiceExtensions.GenerateTokenCacheKey(user.Id, "refresh_token");

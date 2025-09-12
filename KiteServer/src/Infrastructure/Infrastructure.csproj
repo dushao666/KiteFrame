@@ -2,7 +2,6 @@
 
   <ItemGroup>
     <!-- SqlSugar ORM -->
-    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.9" />
     <PackageReference Include="SqlSugar" Version="5.1.4.157" />
 
     <!-- MySQL 驱动 -->

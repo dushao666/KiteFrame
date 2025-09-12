@@ -86,12 +86,12 @@ public static class CacheServiceExtensions
                     }
                 });
 
-                // 添加分布式缓存
-                services.AddStackExchangeRedisCache(options =>
-                {
-                    options.Configuration = redisConnectionString;
-                    options.InstanceName = redisSettings.InstanceName;
-                });
+                // 注释掉分布式缓存配置，只使用自定义Redis服务
+                // services.AddStackExchangeRedisCache(options =>
+                // {
+                //     options.Configuration = redisConnectionString;
+                //     options.InstanceName = redisSettings.InstanceName;
+                // });
 
                 services.AddScoped<RedisCacheService>();
             }
