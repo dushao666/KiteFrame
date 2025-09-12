@@ -73,4 +73,10 @@ public class User : BaseEntity
     /// </summary>
     [SugarColumn(ColumnDescription = "备注", Length = 500, IsNullable = true)]
     public string? Remark { get; set; }
+
+    /// <summary>
+    /// 用户关联的角色列表（导航属性，不映射到数据库）
+    /// </summary>
+    [SugarColumn(IsIgnore = true)]
+    public List<Role> Roles { get; set; } = new List<Role>();
 }

@@ -59,4 +59,19 @@ public class LoginUserDto
     /// 最后登录IP
     /// </summary>
     public string? LastLoginIp { get; set; }
+
+    /// <summary>
+    /// 用户角色列表
+    /// </summary>
+    public List<RoleDto> Roles { get; set; } = new List<RoleDto>();
+
+    /// <summary>
+    /// 用户菜单权限（树形结构）
+    /// </summary>
+    public List<MenuDto> Menus { get; set; } = new List<MenuDto>();
+
+    /// <summary>
+    /// 用户按钮权限列表
+    /// </summary>
+    public List<string> Permissions { get; set; } = new List<string>();
 }

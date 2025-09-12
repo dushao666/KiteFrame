@@ -9,17 +9,23 @@ public class SignInCommandHandler : IRequestHandler<SignInCommand, LoginUserDto>
     private readonly IConfiguration _configuration;
     private readonly ILogger<SignInCommandHandler> _logger;
     private readonly Infrastructure.Services.ICacheService _cacheService;
+    private readonly IMediator _mediator;
 
+    /// <summary>
+    /// 构造函数
+    /// </summary>
     public SignInCommandHandler(
         ISugarUnitOfWork<DBContext> unitOfWork,
         IConfiguration configuration,
         ILogger<SignInCommandHandler> logger,
-        Infrastructure.Services.ICacheService cacheService)
+        Infrastructure.Services.ICacheService cacheService,
+        IMediator mediator)
     {
         _unitOfWork = unitOfWork;
         _configuration = configuration;
         _logger = logger;
         _cacheService = cacheService;
+        _mediator = mediator;
     }
 
     public async Task<LoginUserDto> Handle(SignInCommand request, CancellationToken cancellationToken)
@@ -63,6 +69,14 @@ public class SignInCommandHandler : IRequestHandler<SignInCommand, LoginUserDto>
 
             // 生成Token
             var loginResult = await GenerateTokens(user, request.RememberMe);
+
+            // 获取用户权限信息
+            var userPermissions = await _mediator.Send(new GetUserPermissionsQuery(user.Id), cancellationToken);
+
+            // 设置权限信息
+            loginResult.Roles = userPermissions.Roles;
+            loginResult.Menus = userPermissions.Menus;
+            loginResult.Permissions = userPermissions.Permissions;
 
             _logger.LogInformation("用户 {UserName} 登录成功，IP: {ClientIp}", user.UserName, request.ClientIp);
 

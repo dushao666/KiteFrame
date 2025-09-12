@@ -36,6 +36,7 @@ global using Infrastructure.Extensions;
 
 // Application 命名空间
 global using Application.Commands.Auth;
+global using Application.Queries.Permission;
 
 // 数据注解
 global using System.ComponentModel.DataAnnotations;

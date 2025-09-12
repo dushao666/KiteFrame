@@ -18,10 +18,10 @@ public static class ApplicationServiceExtensions
     {
         // 添加查询服务
         services.AddQueryServices();
-        
+
         // 添加命令处理器（MediatR会自动扫描）
         // 这里不需要手动注册，MediatR会自动发现和注册
-        
+
         return services;
     }
     
@@ -73,7 +73,7 @@ public static class ApplicationServiceExtensions
     {
         // 扫描并注册 Mapster 配置
         Mapster.TypeAdapterConfig.GlobalSettings.Scan(typeof(MapsterConfiguration).Assembly);
-        
+
         return services;
     }
 }

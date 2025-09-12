@@ -43,6 +43,35 @@ public class MapsterConfiguration : IRegister
             .Ignore(dest => dest.UpdateTime) // 由AOP自动设置
             .Ignore(dest => dest.IsDeleted); // 由AOP自动设置
 
+        // 配置Menu实体到MenuDto的映射
+        config.ForType<Menu, MenuDto>()
+            .Map(dest => dest.Id, src => src.Id)
+            .Map(dest => dest.ParentId, src => src.ParentId)
+            .Map(dest => dest.MenuName, src => src.MenuName)
+            .Map(dest => dest.MenuCode, src => src.MenuCode)
+            .Map(dest => dest.MenuType, src => (int)src.MenuType)
+            .Map(dest => dest.Path, src => src.Path)
+            .Map(dest => dest.Component, src => src.Component)
+            .Map(dest => dest.Icon, src => src.Icon)
+            .Map(dest => dest.Sort, src => src.Sort)
+            .Map(dest => dest.IsVisible, src => src.IsVisible)
+            .Map(dest => dest.IsCache, src => src.IsCache)
+            .Map(dest => dest.IsFrame, src => src.IsFrame)
+            .Map(dest => dest.Status, src => src.Status)
+            .Map(dest => dest.Permissions, src => src.Permissions)
+            .Map(dest => dest.Remark, src => src.Remark)
+            .Ignore(dest => dest.Children); // 子菜单由业务逻辑处理
+
+        // 配置Role实体到RoleDto的映射
+        config.ForType<Role, RoleDto>()
+            .Map(dest => dest.Id, src => src.Id)
+            .Map(dest => dest.RoleName, src => src.RoleName)
+            .Map(dest => dest.RoleCode, src => src.RoleCode)
+            .Map(dest => dest.Sort, src => src.Sort)
+            .Map(dest => dest.Status, src => src.Status)
+            .Map(dest => dest.DataScope, src => (int)src.DataScope)
+            .Map(dest => dest.Remark, src => src.Remark);
+
         // 全局配置
         config.Default.PreserveReference(true); // 保持引用关系
         config.Default.NameMatchingStrategy(NameMatchingStrategy.Flexible); // 灵活的名称匹配策略
