@@ -4,7 +4,7 @@ import Motion from "./utils/motion";
 import { useRouter } from "vue-router";
 import { message } from "@/utils/message";
 import { loginRules } from "./utils/rule";
-import { ref, reactive, toRaw } from "vue";
+import { ref, reactive } from "vue";
 import { debounce } from "@pureadmin/utils";
 import { useNav } from "@/layout/hooks/useNav";
 import { useEventListener } from "@vueuse/core";
@@ -13,7 +13,7 @@ import { $t, transformI18n } from "@/plugins/i18n";
 import { useLayout } from "@/layout/hooks/useLayout";
 import { useUserStoreHook } from "@/store/modules/user";
 import { initRouter, getTopMenu } from "@/router/utils";
-import { bg, avatar, illustration } from "./utils/static";
+import { bg, avatar } from "./utils/static";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import { useTranslationLang } from "@/layout/hooks/useTranslationLang";
 import { useDataThemeChange } from "@/layout/hooks/useDataThemeChange";
@@ -117,8 +117,8 @@ useEventListener(document, "keydown", ({ code }) => {
       <el-switch
         v-model="dataTheme"
         inline-prompt
-        :active-icon="dayIcon"
-        :inactive-icon="darkIcon"
+        :active-icon="darkIcon"
+        :inactive-icon="dayIcon"
         @change="dataThemeChange"
       />
       <!-- 国际化 -->
@@ -156,7 +156,16 @@ useEventListener(document, "keydown", ({ code }) => {
     </div>
     <div class="login-container">
       <div class="img">
-        <component :is="toRaw(illustration)" />
+        <div class="feature-card">
+          <div class="feature-badge">KiteFrame</div>
+          <h1 class="feature-title">轻量化 · 高性能 · 可扩展</h1>
+          <p class="feature-desc">一套开箱即用的 .NET 9 + Vue3 企业级脚手架，聚焦工程化与研发效率。</p>
+          <ul class="feature-list">
+            <li>模块化架构，快速扩展业务能力</li>
+            <li>权限与路由按需加载，更快的首屏体验</li>
+            <li>主题与国际化一键切换，易于定制</li>
+          </ul>
+        </div>
       </div>
       <div class="login-box">
         <div class="login-form">

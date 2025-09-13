@@ -7,7 +7,7 @@ import boxen, { type Options as BoxenOptions } from "boxen";
 dayjs.extend(duration);
 
 const welcomeMessage = gradient(["cyan", "magenta"]).multiline(
-  `您好! 欢迎使用 pure-admin 开源项目\n我们为您精心准备了下面两个贴心的保姆级文档\nhttps://pure-admin.cn\nhttps://pure-admin-utils.netlify.app`
+  `您好! 欢迎使用 KiteFrame 开源项目\n源码地址\nhttps://github.com/dushao666/KiteFrame`
 );
 
 const boxenOptions: BoxenOptions = {
