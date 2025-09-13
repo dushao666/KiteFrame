@@ -69,6 +69,12 @@ public class User : BaseEntity
     public string? LastLoginIp { get; set; }
 
     /// <summary>
+    /// 部门ID
+    /// </summary>
+    [SugarColumn(ColumnDescription = "部门ID", IsNullable = true)]
+    public long? DepartmentId { get; set; }
+
+    /// <summary>
     /// 备注
     /// </summary>
     [SugarColumn(ColumnDescription = "备注", Length = 500, IsNullable = true)]
@@ -79,4 +85,10 @@ public class User : BaseEntity
     /// </summary>
     [SugarColumn(IsIgnore = true)]
     public List<Role> Roles { get; set; } = new List<Role>();
+
+    /// <summary>
+    /// 用户所属部门（导航属性，不映射到数据库）
+    /// </summary>
+    [SugarColumn(IsIgnore = true)]
+    public Department? Department { get; set; }
 }
