@@ -108,7 +108,7 @@ public static class CacheServiceExtensions
         services.AddScoped<CacheServiceFactory>();
 
         // 注册主缓存服务
-        services.AddScoped<Infrastructure.Services.ICacheService>(provider =>
+        services.AddScoped<Services.ICacheService>(provider =>
         {
             var factory = provider.GetRequiredService<CacheServiceFactory>();
             return factory.CreateCacheService();

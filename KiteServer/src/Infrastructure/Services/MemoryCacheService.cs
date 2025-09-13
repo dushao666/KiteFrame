@@ -53,7 +53,7 @@ public class MemoryCacheService : ICacheService
         try
         {
             var options = new MemoryCacheEntryOptions();
-            
+
             if (expiration.HasValue)
             {
                 options.AbsoluteExpirationRelativeToNow = expiration;
@@ -64,6 +64,9 @@ public class MemoryCacheService : ICacheService
                 options.SlidingExpiration = TimeSpan.FromMinutes(_cacheSettings.SlidingExpirationMinutes);
             }
 
+            // 设置缓存项大小（当配置了SizeLimit时必须设置）
+            options.Size = CalculateCacheItemSize(value);
+
             // 设置缓存项移除回调
             options.RegisterPostEvictionCallback((k, v, reason, state) =>
             {
@@ -73,7 +76,7 @@ public class MemoryCacheService : ICacheService
 
             _memoryCache.Set(key, value, options);
             _keyTracker.TryAdd(key, true);
-            
+
             _logger.LogDebug("设置内存缓存成功，Key: {Key}, Expiration: {Expiration}", key, expiration);
             return Task.CompletedTask;
         }
@@ -209,16 +212,17 @@ public class MemoryCacheService : ICacheService
         {
             var hash = _memoryCache.Get<Dictionary<string, string>>(key) ?? new Dictionary<string, string>();
             hash[field] = value;
-            
+
             var options = new MemoryCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_cacheSettings.DefaultExpirationMinutes),
-                SlidingExpiration = TimeSpan.FromMinutes(_cacheSettings.SlidingExpirationMinutes)
+                SlidingExpiration = TimeSpan.FromMinutes(_cacheSettings.SlidingExpirationMinutes),
+                Size = CalculateCacheItemSize(hash)
             };
-            
+
             _memoryCache.Set(key, hash, options);
             _keyTracker.TryAdd(key, true);
-            
+
             _logger.LogDebug("设置内存缓存Hash字段成功，Key: {Key}, Field: {Field}", key, field);
             return Task.CompletedTask;
         }
@@ -267,7 +271,8 @@ public class MemoryCacheService : ICacheService
                     var options = new MemoryCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_cacheSettings.DefaultExpirationMinutes),
-                        SlidingExpiration = TimeSpan.FromMinutes(_cacheSettings.SlidingExpirationMinutes)
+                        SlidingExpiration = TimeSpan.FromMinutes(_cacheSettings.SlidingExpirationMinutes),
+                        Size = CalculateCacheItemSize(hash)
                     };
                     _memoryCache.Set(key, hash, options);
                 }
@@ -296,6 +301,47 @@ public class MemoryCacheService : ICacheService
         {
             _logger.LogError(ex, "获取内存缓存Hash所有字段失败，Key: {Key}", key);
             return Task.FromResult(new Dictionary<string, string>());
+        }
+    }
+
+    /// <summary>
+    /// 计算缓存项的大小（字节）
+    /// </summary>
+    /// <param name="value">缓存值</param>
+    /// <returns>估算的大小（字节）</returns>
+    private static long CalculateCacheItemSize<T>(T value)
+    {
+        if (value == null)
+            return 1;
+
+        try
+        {
+            // 对于字符串类型，直接计算字符串长度
+            if (value is string str)
+            {
+                return System.Text.Encoding.UTF8.GetByteCount(str);
+            }
+
+            // 对于字典类型（Hash操作）
+            if (value is Dictionary<string, string> dict)
+            {
+                long size = 0;
+                foreach (var kvp in dict)
+                {
+                    size += System.Text.Encoding.UTF8.GetByteCount(kvp.Key ?? string.Empty);
+                    size += System.Text.Encoding.UTF8.GetByteCount(kvp.Value ?? string.Empty);
+                }
+                return size > 0 ? size : 1;
+            }
+
+            // 对于其他类型，使用JSON序列化来估算大小
+            var json = System.Text.Json.JsonSerializer.Serialize(value);
+            return System.Text.Encoding.UTF8.GetByteCount(json);
+        }
+        catch
+        {
+            // 如果无法计算大小，返回默认值
+            return 1024; // 1KB 作为默认估算值
         }
     }
 }
