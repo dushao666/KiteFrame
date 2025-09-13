@@ -51,4 +51,5 @@ global using Microsoft.IdentityModel.Tokens;
 global using System.Security.Claims;
 global using Application.Commands.User;
 global using Application.Queries.User;
+global using Application.Queries.Permission;
 global using Shared.Models.User;

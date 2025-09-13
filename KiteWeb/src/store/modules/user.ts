@@ -72,6 +72,10 @@ export const useUserStore = defineStore("pure-user", {
         getLogin(data)
           .then(response => {
             if (response?.success && response.data) {
+              // 提取角色和权限信息
+              const roles = response.data.roles?.map(role => role.roleCode) || [];
+              const permissions = response.data.permissions || [];
+
               // 设置token到本地存储
               setToken({
                 accessToken: response.data.accessToken,
@@ -80,14 +84,16 @@ export const useUserStore = defineStore("pure-user", {
                 username: response.data.userName,
                 nickname: response.data.realName || response.data.userName,
                 avatar: response.data.avatar || "",
-                roles: [], // 后续从权限接口获取
-                permissions: [] // 后续从权限接口获取
+                roles: roles,
+                permissions: permissions
               });
 
               // 更新store状态
               this.SET_USERNAME(response.data.userName);
               this.SET_NICKNAME(response.data.realName || response.data.userName);
               this.SET_AVATAR(response.data.avatar || "");
+              this.SET_ROLES(roles);
+              this.SET_PERMS(permissions);
             }
             resolve(response);
           })

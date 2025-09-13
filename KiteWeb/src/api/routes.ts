@@ -1,15 +1,28 @@
 import { http } from "@/utils/http";
 import type { ApiResult } from "./user";
 
-type RouteResult = ApiResult<Array<any>>;
+// 菜单路由数据类型
+export type MenuRoute = {
+  id: number;
+  parentId: number;
+  menuName: string;
+  menuCode: string;
+  menuType: number;
+  path?: string;
+  component?: string;
+  icon?: string;
+  sort: number;
+  isVisible: boolean;
+  isCache: boolean;
+  isFrame: boolean;
+  status: number;
+  permissions?: string;
+  remark?: string;
+  children: MenuRoute[];
+};
+
+type RouteResult = ApiResult<Array<MenuRoute>>;
 
 export const getAsyncRoutes = () => {
-  // 暂时返回静态路由，后续可以对接后台权限接口
-  return Promise.resolve({
-    success: true,
-    message: "获取路由成功",
-    data: [],
-    code: 200,
-    timestamp: new Date().toISOString()
-  } as RouteResult);
+  return http.request<RouteResult>("get", "/auth/routes");
 };

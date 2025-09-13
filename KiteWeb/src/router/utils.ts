@@ -154,6 +154,10 @@ function handleAsyncRoutes(routeList) {
   if (routeList.length === 0) {
     usePermissionStoreHook().handleWholeMenus(routeList);
   } else {
+    // 先设置菜单数据（使用原始的干净路由数据）
+    usePermissionStoreHook().handleWholeMenus(cloneDeep(routeList));
+
+    // 然后处理路由注册（这个过程会修改路由对象，添加额外属性）
     formatFlatteningRoutes(addAsyncRoutes(routeList)).map(
       (v: RouteRecordRaw) => {
         // 防止重复添加路由
@@ -178,7 +182,6 @@ function handleAsyncRoutes(routeList) {
         }
       }
     );
-    usePermissionStoreHook().handleWholeMenus(routeList);
   }
   if (!useMultiTagsStoreHook().getMultiTagsCache) {
     useMultiTagsStoreHook().handleTags("equal", [
@@ -204,17 +207,35 @@ function initRouter() {
       });
     } else {
       return new Promise(resolve => {
-        getAsyncRoutes().then(({ data }) => {
-          handleAsyncRoutes(cloneDeep(data));
-          storageLocal().setItem(key, data);
+        getAsyncRoutes().then((response) => {
+          if (response?.success && response.data) {
+            // 将后端菜单数据转换为前端路由格式
+            const routes = transformMenuToRoutes(response.data);
+            handleAsyncRoutes(cloneDeep(routes));
+            storageLocal().setItem(key, routes);
+          } else {
+            handleAsyncRoutes([]);
+          }
+          resolve(router);
+        }).catch(() => {
+          handleAsyncRoutes([]);
           resolve(router);
         });
       });
     }
   } else {
     return new Promise(resolve => {
-      getAsyncRoutes().then(({ data }) => {
-        handleAsyncRoutes(cloneDeep(data));
+      getAsyncRoutes().then((response) => {
+        if (response?.success && response.data) {
+          // 将后端菜单数据转换为前端路由格式
+          const routes = transformMenuToRoutes(response.data);
+          handleAsyncRoutes(cloneDeep(routes));
+        } else {
+          handleAsyncRoutes([]);
+        }
+        resolve(router);
+      }).catch(() => {
+        handleAsyncRoutes([]);
         resolve(router);
       });
     });
@@ -300,6 +321,50 @@ function handleAliveRoute({ name }: ToRouteType, mode?: string) {
   }
 }
 
+/** 将后端菜单数据转换为前端路由格式 */
+function transformMenuToRoutes(menus: Array<any>): Array<RouteRecordRaw> {
+  if (!menus || !menus.length) return [];
+
+  // 获取当前用户的角色信息，用于权限过滤
+  const currentRoles = storageLocal().getItem<DataInfo<number>>(userKey)?.roles ?? [];
+
+  return menus
+    .filter(menu => menu.menuType === 1 || menu.menuType === 2) // 只处理目录和菜单，过滤按钮
+    .map(menu => {
+      // 创建一个干净的路由对象，只包含Vue Router需要的属性
+      const route = {
+        path: menu.path || `/${menu.menuCode}`,
+        name: menu.menuCode,
+        meta: {
+          title: menu.menuName,
+          icon: menu.icon,
+          rank: menu.sort,
+          showLink: menu.isVisible,
+          keepAlive: menu.isCache,
+          frameSrc: menu.isFrame ? menu.path : undefined,
+          auths: menu.permissions ? menu.permissions.split(',').filter((p: string) => p.trim()) : [],
+          // 为动态路由添加角色信息，确保权限过滤不会过滤掉这些菜单
+          roles: currentRoles.length > 0 ? currentRoles : ["admin"]
+        }
+      } as any;
+
+      // 只有当component存在时才设置
+      if (menu.component) {
+        route.component = menu.component;
+      }
+
+      // 处理子菜单
+      if (menu.children && menu.children.length > 0) {
+        const childRoutes = transformMenuToRoutes(menu.children);
+        if (childRoutes.length > 0) {
+          route.children = childRoutes;
+        }
+      }
+
+      return route;
+    });
+}
+
 /** 过滤后端传来的动态路由 重新生成规范路由 */
 function addAsyncRoutes(arrRoutes: Array<RouteRecordRaw>) {
   if (!arrRoutes || !arrRoutes.length) return;
@@ -315,12 +380,21 @@ function addAsyncRoutes(arrRoutes: Array<RouteRecordRaw>) {
       v.name = (v.children[0].name as string) + "Parent";
     if (v.meta?.frameSrc) {
       v.component = IFrame;
-    } else {
+    } else if (v.component) {
       // 对后端传component组件路径和不传做兼容（如果后端传component组件路径，那么path可以随便写，如果不传，component组件路径会跟path保持一致）
-      const index = v?.component
-        ? modulesRoutesKeys.findIndex(ev => ev.includes(v.component as any))
-        : modulesRoutesKeys.findIndex(ev => ev.includes(v.path));
-      v.component = modulesRoutes[modulesRoutesKeys[index]];
+      const index = modulesRoutesKeys.findIndex(ev => ev.includes(v.component as any));
+      if (index !== -1) {
+        v.component = modulesRoutes[modulesRoutesKeys[index]];
+      } else {
+        // 如果找不到对应的组件，尝试根据路径查找
+        const pathIndex = modulesRoutesKeys.findIndex(ev => ev.includes(v.path));
+        if (pathIndex !== -1) {
+          v.component = modulesRoutes[modulesRoutesKeys[pathIndex]];
+        } else {
+          // 如果都找不到，设置为undefined，让Vue Router处理
+          v.component = undefined;
+        }
+      }
     }
     if (v?.children && v.children.length) {
       addAsyncRoutes(v.children);
@@ -383,10 +457,39 @@ function handleTopMenu(route) {
 
 /** 获取所有菜单中的第一个菜单（顶级菜单）*/
 function getTopMenu(tag = false): menuType {
-  const topMenu = handleTopMenu(
-    usePermissionStoreHook().wholeMenus[0]?.children[0]
-  );
-  tag && useMultiTagsStoreHook().handleTags("push", topMenu);
+  const wholeMenus = usePermissionStoreHook().wholeMenus;
+
+  // 安全检查：确保菜单数组不为空
+  if (!wholeMenus || wholeMenus.length === 0) {
+    console.warn('wholeMenus is empty, returning default route');
+    return {
+      path: "/welcome",
+      name: "Welcome",
+      meta: {
+        title: "首页",
+        icon: "ep:home-filled"
+      }
+    } as menuType;
+  }
+
+  // 获取第一个菜单项
+  const firstMenu = wholeMenus[0];
+  if (!firstMenu) {
+    console.warn('First menu is undefined, returning default route');
+    return {
+      path: "/welcome",
+      name: "Welcome",
+      meta: {
+        title: "首页",
+        icon: "ep:home-filled"
+      }
+    } as menuType;
+  }
+
+  // 如果第一个菜单有子菜单，获取第一个子菜单；否则返回第一个菜单本身
+  const topMenu = handleTopMenu(firstMenu.children?.[0] || firstMenu);
+
+  tag && topMenu && useMultiTagsStoreHook().handleTags("push", topMenu);
   return topMenu;
 }
 

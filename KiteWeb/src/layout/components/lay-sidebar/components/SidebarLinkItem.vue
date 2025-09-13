@@ -16,8 +16,28 @@ const getLinkProps = (item: menuType) => {
       rel: "noopener"
     };
   }
+  // 只传递路由需要的属性，避免传递额外的属性导致路由解析失败
+  const routeLocation: any = {};
+
+  // 优先使用path，如果没有path则使用name
+  if (item.path) {
+    routeLocation.path = item.path;
+  } else if (item.name) {
+    routeLocation.name = item.name;
+  }
+
+  // 如果有query参数，也传递过去
+  if (item.query) {
+    routeLocation.query = item.query;
+  }
+
+  // 如果有params参数，也传递过去
+  if (item.params) {
+    routeLocation.params = item.params;
+  }
+
   return {
-    to: item
+    to: routeLocation
   };
 };
 </script>

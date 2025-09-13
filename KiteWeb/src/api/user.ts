@@ -9,6 +9,60 @@ export type ApiResult<T = any> = {
   timestamp: string;
 };
 
+// 角色信息
+export type RoleData = {
+  /** 角色ID */
+  id: number;
+  /** 角色名称 */
+  roleName: string;
+  /** 角色编码 */
+  roleCode: string;
+  /** 排序号 */
+  sort: number;
+  /** 状态 */
+  status: number;
+  /** 数据权限范围 */
+  dataScope: number;
+  /** 备注 */
+  remark?: string;
+};
+
+// 菜单信息
+export type MenuData = {
+  /** 菜单ID */
+  id: number;
+  /** 父菜单ID */
+  parentId: number;
+  /** 菜单名称 */
+  menuName: string;
+  /** 菜单编码 */
+  menuCode: string;
+  /** 菜单类型 */
+  menuType: number;
+  /** 路由路径 */
+  path?: string;
+  /** 组件路径 */
+  component?: string;
+  /** 菜单图标 */
+  icon?: string;
+  /** 排序号 */
+  sort: number;
+  /** 是否显示 */
+  isVisible: boolean;
+  /** 是否缓存 */
+  isCache: boolean;
+  /** 是否外链 */
+  isFrame: boolean;
+  /** 状态 */
+  status: number;
+  /** 权限标识 */
+  permissions?: string;
+  /** 备注 */
+  remark?: string;
+  /** 子菜单列表 */
+  children: MenuData[];
+};
+
 // 登录用户信息
 export type LoginUserData = {
   /** 用户ID */
@@ -33,6 +87,12 @@ export type LoginUserData = {
   lastLoginTime?: string;
   /** 最后登录IP */
   lastLoginIp?: string;
+  /** 用户角色列表 */
+  roles?: RoleData[];
+  /** 用户菜单权限 */
+  menus?: MenuData[];
+  /** 用户按钮权限列表 */
+  permissions?: string[];
 };
 
 export type UserResult = ApiResult<LoginUserData>;

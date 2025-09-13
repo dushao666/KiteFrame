@@ -151,6 +151,35 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
+    /// 获取当前用户的菜单路由
+    /// </summary>
+    /// <returns>菜单路由列表</returns>
+    [HttpGet("routes")]
+    [Authorize]
+    [ProducesResponseType(typeof(ApiResult<List<MenuDto>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetUserRoutesAsync()
+    {
+        try
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized(ApiResult.Fail("用户未登录"));
+            }
+
+            var query = new GetUserMenuTreeQuery(long.Parse(userId));
+            var menus = await _mediator.Send(query);
+
+            return Ok(ApiResult<List<MenuDto>>.Ok(menus, "获取用户路由成功"));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "获取用户路由过程中发生错误");
+            return StatusCode(500, ApiResult.Fail("获取用户路由失败"));
+        }
+    }
+
+    /// <summary>
     /// 发送短信验证码
     /// </summary>
     /// <param name="command">发送短信验证码命令</param>
