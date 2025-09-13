@@ -12,31 +12,35 @@ CREATE DATABASE IF NOT EXISTS `kite_log` DEFAULT CHARACTER SET utf8mb4 COLLATE u
 -- 使用测试数据库
 USE `kite_test`;
 
+-- 设置字符集
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
+
 -- =============================================
 -- 用户表 (sys_user)
 -- =============================================
 DROP TABLE IF EXISTS `sys_user`;
 CREATE TABLE `sys_user` (
-  `Id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `UserName` varchar(50) NOT NULL COMMENT '用户名',
-  `Password` varchar(200) NOT NULL COMMENT '密码',
-  `Email` varchar(100) DEFAULT NULL COMMENT '邮箱',
-  `Phone` varchar(20) DEFAULT NULL COMMENT '手机号',
-  `RealName` varchar(50) DEFAULT NULL COMMENT '真实姓名',
-  `DingTalkId` varchar(100) DEFAULT NULL COMMENT '钉钉用户ID',
-  `Avatar` varchar(200) DEFAULT NULL COMMENT '头像',
-  `DepartmentId` bigint DEFAULT NULL COMMENT '部门ID',
-  `Status` int NOT NULL DEFAULT '1' COMMENT '状态（0：禁用，1：启用）',
-  `LastLoginTime` datetime DEFAULT NULL COMMENT '最后登录时间',
-  `LastLoginIp` varchar(50) DEFAULT NULL COMMENT '最后登录IP',
-  `Remark` varchar(500) DEFAULT NULL COMMENT '备注',
-  `CreateTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `UpdateTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `CreateUserId` bigint DEFAULT NULL COMMENT '创建用户ID',
-  `UpdateUserId` bigint DEFAULT NULL COMMENT '更新用户ID',
-  `IsDeleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否删除',
-  `DeleteTime` datetime DEFAULT NULL COMMENT '删除时间',
-  `DeleteUserId` bigint DEFAULT NULL COMMENT '删除用户ID',
+  `Id` bigint NOT NULL AUTO_INCREMENT COMMENT 'Primary Key ID',
+  `UserName` varchar(50) NOT NULL COMMENT 'Username',
+  `Password` varchar(200) NOT NULL COMMENT 'Password',
+  `Email` varchar(100) DEFAULT NULL COMMENT 'Email',
+  `Phone` varchar(20) DEFAULT NULL COMMENT 'Phone Number',
+  `RealName` varchar(100) DEFAULT NULL COMMENT 'Real Name',
+  `DingTalkId` varchar(100) DEFAULT NULL COMMENT 'DingTalk User ID',
+  `Avatar` varchar(200) DEFAULT NULL COMMENT 'Avatar',
+  `DepartmentId` bigint DEFAULT NULL COMMENT 'Department ID',
+  `Status` int NOT NULL DEFAULT '1' COMMENT 'Status (0:Disabled, 1:Enabled)',
+  `LastLoginTime` datetime DEFAULT NULL COMMENT 'Last Login Time',
+  `LastLoginIp` varchar(50) DEFAULT NULL COMMENT 'Last Login IP',
+  `Remark` varchar(500) DEFAULT NULL COMMENT 'Remark',
+  `CreateTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Create Time',
+  `UpdateTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update Time',
+  `CreateUserId` bigint DEFAULT NULL COMMENT 'Create User ID',
+  `UpdateUserId` bigint DEFAULT NULL COMMENT 'Update User ID',
+  `IsDeleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Is Deleted',
+  `DeleteTime` datetime DEFAULT NULL COMMENT 'Delete Time',
+  `DeleteUserId` bigint DEFAULT NULL COMMENT 'Delete User ID',
   PRIMARY KEY (`Id`),
   UNIQUE KEY `UK_sys_user_username` (`UserName`),
   UNIQUE KEY `UK_sys_user_dingtalkid` (`DingTalkId`),
@@ -54,7 +58,7 @@ CREATE TABLE `sys_user` (
 DROP TABLE IF EXISTS `sys_role`;
 CREATE TABLE `sys_role` (
   `Id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `RoleName` varchar(50) NOT NULL COMMENT '角色名称',
+  `RoleName` varchar(100) NOT NULL COMMENT '角色名称',
   `RoleCode` varchar(100) NOT NULL COMMENT '角色编码（唯一标识）',
   `Sort` int NOT NULL DEFAULT '0' COMMENT '排序号',
   `Status` int NOT NULL DEFAULT '1' COMMENT '状态（0：禁用，1：启用）',
@@ -81,7 +85,7 @@ DROP TABLE IF EXISTS `sys_department`;
 CREATE TABLE `sys_department` (
   `Id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `ParentId` bigint NOT NULL DEFAULT '0' COMMENT '父部门ID（0表示根部门）',
-  `DepartmentName` varchar(50) NOT NULL COMMENT '部门名称',
+  `DepartmentName` varchar(100) NOT NULL COMMENT '部门名称',
   `DepartmentCode` varchar(100) NOT NULL COMMENT '部门编码（唯一标识）',
   `DepartmentType` int NOT NULL DEFAULT '2' COMMENT '部门类型（1：公司，2：部门，3：小组）',
   `LeaderId` bigint DEFAULT NULL COMMENT '负责人用户ID',
@@ -114,7 +118,7 @@ DROP TABLE IF EXISTS `sys_menu`;
 CREATE TABLE `sys_menu` (
   `Id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `ParentId` bigint NOT NULL DEFAULT '0' COMMENT '父菜单ID（0表示根菜单）',
-  `MenuName` varchar(50) NOT NULL COMMENT '菜单名称',
+  `MenuName` varchar(100) NOT NULL COMMENT '菜单名称',
   `MenuCode` varchar(100) NOT NULL COMMENT '菜单编码（唯一标识）',
   `MenuType` int NOT NULL DEFAULT '2' COMMENT '菜单类型（1：目录，2：菜单，3：按钮）',
   `Path` varchar(200) DEFAULT NULL COMMENT '路由路径',
@@ -192,16 +196,16 @@ INSERT INTO `sys_user` (
 ) VALUES (
   1,
   'admin',
-  'ba3253876aed6bc22d4a6ff53d8406c6ad864195ed144ab5c87621b6c233b548baeae6956df346ec8c17f5ea10f35ee3cbc514797ed7ddd3145464e2a0bab413', -- 密码: 123456 (SHA512加密)
+  'ba3253876aed6bc22d4a6ff53d8406c6ad864195ed144ab5c87621b6c233b548baeae6956df346ec8c17f5ea10f35ee3cbc514797ed7ddd3145464e2a0bab413',
   'admin@kiteserver.com',
   '系统管理员',
-  2, -- 分配到技术部
+  2,
   1,
   '系统默认管理员账户'
 ),
 -- 添加测试用户
-(2, 'zhangsan', 'ba3253876aed6bc22d4a6ff53d8406c6ad864195ed144ab5c87621b6c233b548baeae6956df346ec8c17f5ea10f35ee3cbc514797ed7ddd3145464e2a0bab413', 'zhangsan@kiteframe.com', '张三', 6, 1, '前端开发'),
-(3, 'lisi', 'ba3253876aed6bc22d4a6ff53d8406c6ad864195ed144ab5c87621b6c233b548baeae6956df346ec8c17f5ea10f35ee3cbc514797ed7ddd3145464e2a0bab413', 'lisi@kiteframe.com', '李四', 7, 1, '后端开发'),
+(2, 'zhangsan', 'ba3253876aed6bc22d4a6ff53d8406c6ad864195ed144ab5c87621b6c233b548baeae6956df346ec8c17f5ea10f35ee3cbc514797ed7ddd3145464e2a0bab413', 'zhangsan@kiteframe.com', '张三', 6, 1, '前端开发工程师'),
+(3, 'lisi', 'ba3253876aed6bc22d4a6ff53d8406c6ad864195ed144ab5c87621b6c233b548baeae6956df346ec8c17f5ea10f35ee3cbc514797ed7ddd3145464e2a0bab413', 'lisi@kiteframe.com', '李四', 7, 1, '后端开发工程师'),
 (4, 'wangwu', 'ba3253876aed6bc22d4a6ff53d8406c6ad864195ed144ab5c87621b6c233b548baeae6956df346ec8c17f5ea10f35ee3cbc514797ed7ddd3145464e2a0bab413', 'wangwu@kiteframe.com', '王五', 8, 1, '测试工程师'),
 (5, 'zhaoliu', 'ba3253876aed6bc22d4a6ff53d8406c6ad864195ed144ab5c87621b6c233b548baeae6956df346ec8c17f5ea10f35ee3cbc514797ed7ddd3145464e2a0bab413', 'zhaoliu@kiteframe.com', '赵六', 10, 1, 'UI设计师');
 
