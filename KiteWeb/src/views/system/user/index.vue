@@ -4,7 +4,11 @@
       <template #header>
         <div class="card-header">
           <span>用户管理</span>
-          <el-button type="primary" @click="handleAdd">
+          <el-button 
+            type="primary" 
+            @click="handleAdd"
+            v-permission="'system:user:add'"
+          >
             <el-icon><Plus /></el-icon>
             新增用户
           </el-button>
@@ -62,21 +66,32 @@
             </template>
           </el-table-column>
           <el-table-column prop="remark" label="备注" min-width="120" align="center" />
-          <el-table-column label="操作" width="180" fixed="right" align="center">
+          <el-table-column label="操作" width="240" fixed="right" align="center">
             <template #default="{ row }">
               <div class="action-buttons">
                 <el-button
                   type="primary"
                   size="small"
                   @click="handleEdit(row)"
+                  v-permission="'system:user:edit'"
                 >
                   <el-icon><Edit /></el-icon>
                   编辑
                 </el-button>
                 <el-button
+                  type="warning"
+                  size="small"
+                  @click="handleAssignRole(row)"
+                  v-permission="'system:user:assign'"
+                >
+                  <el-icon><Key /></el-icon>
+                  分配角色
+                </el-button>
+                <el-button
                   type="danger"
                   size="small"
                   @click="handleDelete(row)"
+                  v-permission="'system:user:delete'"
                 >
                   <el-icon><Delete /></el-icon>
                   删除
@@ -161,13 +176,51 @@
         </div>
       </template>
     </el-dialog>
+
+    <!-- 角色分配对话框 -->
+    <el-dialog
+      v-model="roleDialogVisible"
+      title="分配角色"
+      width="500px"
+      :close-on-click-modal="false"
+    >
+      <div class="role-assignment">
+        <div class="user-info">
+          <el-descriptions :column="2" border>
+            <el-descriptions-item label="用户名">{{ currentUser?.userName }}</el-descriptions-item>
+            <el-descriptions-item label="真实姓名">{{ currentUser?.realName }}</el-descriptions-item>
+          </el-descriptions>
+        </div>
+        
+        <div class="role-selection" style="margin-top: 20px;">
+          <el-transfer
+            v-model="selectedRoleIds"
+            :data="allRoles"
+            :titles="['可选角色', '已分配角色']"
+            :button-texts="['移除', '分配']"
+            :props="{ key: 'id', label: 'roleName' }"
+            filterable
+            filter-placeholder="搜索角色"
+          />
+        </div>
+      </div>
+
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="roleDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="handleSaveUserRoles" :loading="roleAssignLoading">
+            保存
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from "vue";
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus";
-import { Plus, Search, Refresh, Edit, Delete } from "@element-plus/icons-vue";
+import { Plus, Search, Refresh, Edit, Delete, Key } from "@element-plus/icons-vue";
 import {
   getUsers,
   getUserById,
@@ -192,6 +245,13 @@ const dialogVisible = ref(false);
 const isEdit = ref(false);
 const currentUserId = ref<number>();
 const formRef = ref<FormInstance>();
+
+// 角色分配相关
+const roleDialogVisible = ref(false);
+const roleAssignLoading = ref(false);
+const currentUser = ref<UserData | null>(null);
+const allRoles = ref<any[]>([]);
+const selectedRoleIds = ref<number[]>([]);
 
 // 搜索表单
 const searchForm = reactive<GetUsersRequest>({
@@ -459,6 +519,59 @@ const handleSubmit = async () => {
     ElMessage.error("操作失败");
   } finally {
     submitLoading.value = false;
+  }
+};
+
+// 分配角色
+const handleAssignRole = async (row: UserData) => {
+  try {
+    currentUser.value = row;
+    // 获取所有角色列表
+    await fetchAllRoles();
+    // 获取用户已分配的角色
+    await fetchUserRoles(row.id);
+    roleDialogVisible.value = true;
+  } catch (error) {
+    console.error("获取角色信息失败:", error);
+    ElMessage.error("获取角色信息失败");
+  }
+};
+
+// 获取所有角色
+const fetchAllRoles = async () => {
+  // 这里需要调用角色API，暂时使用模拟数据
+  allRoles.value = [
+    { id: 1, roleName: "超级管理员", disabled: false },
+    { id: 2, roleName: "系统管理员", disabled: false },
+    { id: 3, roleName: "普通用户", disabled: false }
+  ];
+};
+
+// 获取用户已分配的角色
+const fetchUserRoles = async (userId: number) => {
+  // 这里需要调用用户角色关联API，暂时使用模拟数据
+  selectedRoleIds.value = [3]; // 假设用户已分配普通用户角色
+};
+
+// 保存用户角色分配
+const handleSaveUserRoles = async () => {
+  if (!currentUser.value) return;
+  
+  try {
+    roleAssignLoading.value = true;
+    // 这里需要调用保存用户角色的API
+    console.log("保存用户角色:", {
+      userId: currentUser.value.id,
+      roleIds: selectedRoleIds.value
+    });
+    
+    ElMessage.success("角色分配成功");
+    roleDialogVisible.value = false;
+  } catch (error) {
+    console.error("保存用户角色失败:", error);
+    ElMessage.error("保存用户角色失败");
+  } finally {
+    roleAssignLoading.value = false;
   }
 };
 

@@ -27,9 +27,15 @@ const app = createApp(App);
 
 // 自定义指令
 import * as directives from "@/directives";
+import { permission, permissionDisabled } from "@/directives/permission";
+import { useUserStore } from "@/stores/user";
 Object.keys(directives).forEach(key => {
   app.directive(key, (directives as { [key: string]: Directive })[key]);
 });
+
+// 注册权限指令
+app.directive("permission", permission);
+app.directive("permission-disabled", permissionDisabled);
 
 // 全局注册@iconify/vue图标库
 import {
@@ -55,6 +61,11 @@ app.use(VueTippy);
 
 getPlatformConfig(app).then(async config => {
   setupStore(app);
+  
+  // 初始化用户权限数据
+  const userStore = useUserStore();
+  userStore.initUserPermissions();
+  
   app.use(router);
   await router.isReady();
   injectResponsiveStorage(app, config);

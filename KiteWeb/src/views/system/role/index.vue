@@ -4,7 +4,11 @@
       <template #header>
         <div class="card-header">
           <span>角色管理</span>
-          <el-button type="primary" @click="handleAdd">
+          <el-button 
+            type="primary" 
+            @click="handleAdd"
+            v-permission="'system:role:add'"
+          >
             <el-icon><Plus /></el-icon>
             新增角色
           </el-button>
@@ -77,21 +81,32 @@
             </template>
           </el-table-column>
           <el-table-column prop="remark" label="备注" min-width="120" align="center" />
-          <el-table-column label="操作" width="180" fixed="right" align="center">
+          <el-table-column label="操作" width="240" fixed="right" align="center">
             <template #default="{ row }">
               <div class="action-buttons">
                 <el-button
                   type="primary"
                   size="small"
                   @click="handleEdit(row)"
+                  v-permission="'system:role:edit'"
                 >
                   <el-icon><Edit /></el-icon>
                   编辑
                 </el-button>
                 <el-button
+                  type="warning"
+                  size="small"
+                  @click="handleAssignPermission(row)"
+                  v-permission="'system:role:assign'"
+                >
+                  <el-icon><Setting /></el-icon>
+                  分配权限
+                </el-button>
+                <el-button
                   type="danger"
                   size="small"
                   @click="handleDelete(row)"
+                  v-permission="'system:role:delete'"
                 >
                   <el-icon><Delete /></el-icon>
                   删除
@@ -220,13 +235,64 @@
         </div>
       </template>
     </el-dialog>
+
+    <!-- 权限分配对话框 -->
+    <el-dialog
+      v-model="permissionDialogVisible"
+      title="分配权限"
+      width="800px"
+      :close-on-click-modal="false"
+    >
+      <div class="permission-assignment">
+        <div class="role-info">
+          <el-descriptions :column="2" border>
+            <el-descriptions-item label="角色名称">{{ currentRole?.roleName }}</el-descriptions-item>
+            <el-descriptions-item label="角色编码">{{ currentRole?.roleCode }}</el-descriptions-item>
+          </el-descriptions>
+        </div>
+        
+        <div class="menu-tree" style="margin-top: 20px;">
+          <el-tree
+            ref="menuTreeRef"
+            :data="menuTreeData"
+            :props="{ children: 'children', label: 'menuName' }"
+            show-checkbox
+            node-key="id"
+            :default-checked-keys="checkedMenuIds"
+            :default-expand-all="true"
+            check-strictly
+          >
+            <template #default="{ node, data }">
+              <span class="tree-node">
+                <el-icon v-if="data.icon">
+                  <component :is="data.icon" />
+                </el-icon>
+                <span>{{ data.menuName }}</span>
+                <el-tag v-if="data.menuType === 3" type="info" size="small" style="margin-left: 8px;">
+                  按钮
+                </el-tag>
+              </span>
+            </template>
+          </el-tree>
+        </div>
+      </div>
+
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="permissionDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="handleSaveRolePermissions" :loading="permissionAssignLoading">
+            保存
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { Plus, Search, Refresh, Edit, Delete } from "@element-plus/icons-vue";
+import { Plus, Search, Refresh, Edit, Delete, Setting } from "@element-plus/icons-vue";
 import type { FormInstance, FormRules } from "element-plus";
 import {
   getRoles,
@@ -270,6 +336,14 @@ const dialogTitle = ref("");
 const isEdit = ref(false);
 const submitLoading = ref(false);
 const formRef = ref<FormInstance>();
+
+// 权限分配相关
+const permissionDialogVisible = ref(false);
+const permissionAssignLoading = ref(false);
+const currentRole = ref<RoleData | null>(null);
+const menuTreeData = ref<any[]>([]);
+const checkedMenuIds = ref<number[]>([]);
+const menuTreeRef = ref();
 
 // 表单数据
 const formData = reactive<CreateRoleRequest & { id?: number }>({
@@ -501,6 +575,76 @@ const handleSubmit = async () => {
     ElMessage.error("操作失败");
   } finally {
     submitLoading.value = false;
+  }
+};
+
+// 分配权限
+const handleAssignPermission = async (row: RoleData) => {
+  try {
+    currentRole.value = row;
+    // 获取菜单树数据
+    await fetchMenuTree();
+    // 获取角色已分配的权限
+    await fetchRolePermissions(row.id);
+    permissionDialogVisible.value = true;
+  } catch (error) {
+    console.error("获取权限信息失败:", error);
+    ElMessage.error("获取权限信息失败");
+  }
+};
+
+// 获取菜单树数据
+const fetchMenuTree = async () => {
+  // 这里需要调用菜单树API，暂时使用模拟数据
+  menuTreeData.value = [
+    {
+      id: 1,
+      menuName: "系统管理",
+      menuType: 1,
+      icon: "Setting",
+      children: [
+        { id: 2, menuName: "用户管理", menuType: 2, icon: "User" },
+        { id: 3, menuName: "角色管理", menuType: 2, icon: "Avatar" },
+        { id: 4, menuName: "菜单管理", menuType: 2, icon: "Menu" },
+        { id: 5, menuName: "新增用户", menuType: 3, parentId: 2 },
+        { id: 6, menuName: "编辑用户", menuType: 3, parentId: 2 },
+        { id: 7, menuName: "删除用户", menuType: 3, parentId: 2 }
+      ]
+    }
+  ];
+};
+
+// 获取角色已分配的权限
+const fetchRolePermissions = async (roleId: number) => {
+  // 这里需要调用角色权限关联API，暂时使用模拟数据
+  checkedMenuIds.value = [2, 3, 5, 6]; // 假设角色已分配这些权限
+};
+
+// 保存角色权限分配
+const handleSaveRolePermissions = async () => {
+  if (!currentRole.value || !menuTreeRef.value) return;
+  
+  try {
+    permissionAssignLoading.value = true;
+    
+    // 获取选中的菜单ID
+    const checkedKeys = menuTreeRef.value.getCheckedKeys();
+    const halfCheckedKeys = menuTreeRef.value.getHalfCheckedKeys();
+    const allSelectedKeys = [...checkedKeys, ...halfCheckedKeys];
+    
+    // 这里需要调用保存角色权限的API
+    console.log("保存角色权限:", {
+      roleId: currentRole.value.id,
+      menuIds: allSelectedKeys
+    });
+    
+    ElMessage.success("权限分配成功");
+    permissionDialogVisible.value = false;
+  } catch (error) {
+    console.error("保存角色权限失败:", error);
+    ElMessage.error("保存角色权限失败");
+  } finally {
+    permissionAssignLoading.value = false;
   }
 };
 

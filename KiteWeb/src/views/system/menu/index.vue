@@ -13,7 +13,11 @@
               <el-icon><ArrowUp /></el-icon>
               折叠全部
             </el-button>
-            <el-button type="primary" @click="handleAdd">
+            <el-button 
+              type="primary" 
+              @click="handleAdd"
+              v-permission="'system:menu:add'"
+            >
               <el-icon><Plus /></el-icon>
               新增菜单
             </el-button>
@@ -126,15 +130,30 @@
           <el-table-column label="操作" width="220" fixed="right" align="center">
             <template #default="{ row }">
               <div class="action-buttons">
-                <el-button type="primary" size="small" @click="handleEdit(row)">
+                <el-button 
+                  type="primary" 
+                  size="small" 
+                  @click="handleEdit(row)"
+                  v-permission="'system:menu:edit'"
+                >
                   <el-icon><Edit /></el-icon>
                   编辑
                 </el-button>
-                <el-button type="success" size="small" @click="handleAddChild(row)">
+                <el-button 
+                  type="success" 
+                  size="small" 
+                  @click="handleAddChild(row)"
+                  v-permission="'system:menu:add'"
+                >
                   <el-icon><Plus /></el-icon>
                   添加子菜单
                 </el-button>
-                <el-button type="danger" size="small" @click="handleDelete(row)">
+                <el-button 
+                  type="danger" 
+                  size="small" 
+                  @click="handleDelete(row)"
+                  v-permission="'system:menu:delete'"
+                >
                   <el-icon><Delete /></el-icon>
                   删除
                 </el-button>
