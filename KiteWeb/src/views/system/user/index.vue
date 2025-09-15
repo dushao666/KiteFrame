@@ -66,7 +66,7 @@
             </template>
           </el-table-column>
           <el-table-column prop="remark" label="备注" min-width="120" align="center" />
-          <el-table-column label="操作" width="240" fixed="right" align="center">
+          <el-table-column label="操作" width="280" fixed="right" align="center">
             <template #default="{ row }">
               <div class="action-buttons">
                 <el-button
@@ -192,16 +192,52 @@
           </el-descriptions>
         </div>
         
-        <div class="role-selection" style="margin-top: 20px;">
-          <el-transfer
-            v-model="selectedRoleIds"
-            :data="allRoles"
-            :titles="['可选角色', '已分配角色']"
-            :button-texts="['移除', '分配']"
-            :props="{ key: 'id', label: 'roleName' }"
-            filterable
-            filter-placeholder="搜索角色"
-          />
+        <div class="role-selection" style="margin-top: 20px; display: flex; gap: 20px;">
+          <div style="flex: 1;">
+            <h4 style="margin-bottom: 10px;">可选角色</h4>
+            <div style="border: 1px solid #dcdfe6; border-radius: 4px; padding: 10px; min-height: 200px; max-height: 300px; overflow-y: auto;">
+              <el-checkbox-group v-model="availableRoles">
+                <div v-for="role in allRoles.filter(r => !selectedRoleIds.includes(r.id))" :key="role.id" style="margin-bottom: 8px;">
+                  <el-checkbox :value="role.id" :label="role.roleName" />
+                </div>
+              </el-checkbox-group>
+              <div v-if="allRoles.filter(r => !selectedRoleIds.includes(r.id)).length === 0" style="color: #909399; text-align: center; padding: 20px;">
+                暂无可分配角色
+              </div>
+            </div>
+            <div style="margin-top: 10px; text-align: center;">
+              <el-button 
+                type="primary" 
+                @click="handleAssignSelectedRoles"
+                :disabled="!availableRoles.length"
+              >
+                分配 →
+              </el-button>
+            </div>
+          </div>
+          
+          <div style="flex: 1;">
+            <h4 style="margin-bottom: 10px;">已分配角色</h4>
+            <div style="border: 1px solid #dcdfe6; border-radius: 4px; padding: 10px; min-height: 200px; max-height: 300px; overflow-y: auto;">
+              <el-checkbox-group v-model="assignedRoles">
+                <div v-for="role in allRoles.filter(r => selectedRoleIds.includes(r.id))" :key="role.id" style="margin-bottom: 8px;">
+                  <el-checkbox :value="role.id" :label="role.roleName" />
+                </div>
+              </el-checkbox-group>
+              <div v-if="selectedRoleIds.length === 0" style="color: #909399; text-align: center; padding: 20px;">
+                暂无已分配角色
+              </div>
+            </div>
+            <div style="margin-top: 10px; text-align: center;">
+              <el-button 
+                type="danger" 
+                @click="handleRemoveSelectedRoles"
+                :disabled="!assignedRoles.length"
+              >
+                ← 移除
+              </el-button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -252,6 +288,8 @@ const roleAssignLoading = ref(false);
 const currentUser = ref<UserData | null>(null);
 const allRoles = ref<any[]>([]);
 const selectedRoleIds = ref<number[]>([]);
+const availableRoles = ref<number[]>([]);
+const assignedRoles = ref<number[]>([]);
 
 // 搜索表单
 const searchForm = reactive<GetUsersRequest>({
@@ -553,12 +591,29 @@ const fetchUserRoles = async (userId: number) => {
   selectedRoleIds.value = [3]; // 假设用户已分配普通用户角色
 };
 
+// 分配选中的角色
+const handleAssignSelectedRoles = () => {
+  if (availableRoles.value.length > 0) {
+    selectedRoleIds.value.push(...availableRoles.value);
+    availableRoles.value = [];
+  }
+};
+
+// 移除选中的角色
+const handleRemoveSelectedRoles = () => {
+  if (assignedRoles.value.length > 0) {
+    selectedRoleIds.value = selectedRoleIds.value.filter(id => !assignedRoles.value.includes(id));
+    assignedRoles.value = [];
+  }
+};
+
 // 保存用户角色分配
 const handleSaveUserRoles = async () => {
   if (!currentUser.value) return;
   
   try {
     roleAssignLoading.value = true;
+    
     // 这里需要调用保存用户角色的API
     console.log("保存用户角色:", {
       userId: currentUser.value.id,

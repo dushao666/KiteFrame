@@ -81,7 +81,7 @@
             </template>
           </el-table-column>
           <el-table-column prop="remark" label="备注" min-width="120" align="center" />
-          <el-table-column label="操作" width="240" fixed="right" align="center">
+          <el-table-column label="操作" width="280" fixed="right" align="center">
             <template #default="{ row }">
               <div class="action-buttons">
                 <el-button
