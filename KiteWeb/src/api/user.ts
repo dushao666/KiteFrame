@@ -144,3 +144,119 @@ export const refreshTokenApi = (data: RefreshTokenRequest) => {
 export const logout = () => {
   return http.request<ApiResult>("post", "/auth/signout");
 };
+
+// ==================== 用户管理相关 API ====================
+
+// 用户信息
+export type UserData = {
+  /** 用户ID */
+  id: number;
+  /** 用户名 */
+  userName: string;
+  /** 邮箱 */
+  email?: string;
+  /** 手机号 */
+  phone?: string;
+  /** 真实姓名 */
+  realName?: string;
+  /** 钉钉用户ID */
+  dingTalkId?: string;
+  /** 状态 */
+  status: number;
+  /** 备注 */
+  remark?: string;
+  /** 创建时间 */
+  createTime: string;
+};
+
+// 分页结果
+export type PagedResult<T> = {
+  /** 数据列表 */
+  items: T[];
+  /** 总数量 */
+  totalCount: number;
+  /** 页码 */
+  pageIndex: number;
+  /** 页大小 */
+  pageSize: number;
+};
+
+// 获取用户列表请求参数
+export type GetUsersRequest = {
+  /** 页码 */
+  pageIndex?: number;
+  /** 页大小 */
+  pageSize?: number;
+  /** 关键词 */
+  keyword?: string;
+};
+
+// 创建用户请求参数
+export type CreateUserRequest = {
+  /** 用户名 */
+  userName: string;
+  /** 密码 */
+  password: string;
+  /** 邮箱 */
+  email?: string;
+  /** 手机号 */
+  phone?: string;
+  /** 真实姓名 */
+  realName?: string;
+  /** 钉钉用户ID */
+  dingTalkId?: string;
+  /** 状态 */
+  status?: number;
+  /** 备注 */
+  remark?: string;
+};
+
+// 更新用户请求参数
+export type UpdateUserRequest = {
+  /** 用户名 */
+  userName: string;
+  /** 邮箱 */
+  email?: string;
+  /** 手机号 */
+  phone?: string;
+  /** 真实姓名 */
+  realName?: string;
+  /** 钉钉用户ID */
+  dingTalkId?: string;
+  /** 状态 */
+  status: number;
+  /** 备注 */
+  remark?: string;
+};
+
+// API 返回类型定义
+export type UsersResult = ApiResult<PagedResult<UserData>>;
+export type UserResult = ApiResult<UserData>;
+export type CreateUserResult = ApiResult<number>;
+export type UpdateUserResult = ApiResult<boolean>;
+export type DeleteUserResult = ApiResult<boolean>;
+
+/** 获取用户列表 */
+export const getUsers = (params: GetUsersRequest) => {
+  return http.request<UsersResult>("get", "/user", { params });
+};
+
+/** 根据ID获取用户 */
+export const getUserById = (id: number) => {
+  return http.request<UserResult>("get", `/user/${id}`);
+};
+
+/** 创建用户 */
+export const createUser = (data: CreateUserRequest) => {
+  return http.request<CreateUserResult>("post", "/user", { data });
+};
+
+/** 更新用户 */
+export const updateUser = (id: number, data: UpdateUserRequest) => {
+  return http.request<UpdateUserResult>("put", `/user/${id}`, { data });
+};
+
+/** 删除用户 */
+export const deleteUser = (id: number) => {
+  return http.request<DeleteUserResult>("delete", `/user/${id}`);
+};

@@ -1,7 +1,6 @@
 using Domain.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Repository;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -17,11 +16,10 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static void AddCustomDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        SnowFlakeSingle.WorkId = 1;
-        
+        // SnowFlakeSingle.WorkId = 1;
         SqlSugarScope sqlSugar = new SqlSugarScope(new ConnectionConfig()
         {
-            DbType = SqlSugar.DbType.MySql,
+            DbType = DbType.MySql,
             ConnectionString = configuration.GetConnectionString("DefaultConnection"),
             IsAutoCloseConnection = true,
             InitKeyType = InitKeyType.Attribute

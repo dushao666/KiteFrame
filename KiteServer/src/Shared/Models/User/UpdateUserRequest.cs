@@ -15,13 +15,11 @@ public class UpdateUserRequest
     /// <summary>
     /// 邮箱
     /// </summary>
-    [EmailAddress(ErrorMessage = "邮箱格式不正确")]
     public string? Email { get; set; }
 
     /// <summary>
     /// 手机号
     /// </summary>
-    [Phone(ErrorMessage = "手机号格式不正确")]
     public string? Phone { get; set; }
 
     /// <summary>

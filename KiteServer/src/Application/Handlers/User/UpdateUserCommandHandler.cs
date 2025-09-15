@@ -1,6 +1,4 @@
 using Application.Commands.User;
-using Repository;
-using SqlSugar;
 
 namespace Application.Handlers.User;
 
@@ -39,6 +37,54 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, ApiRe
                 if (existingUser != null)
                 {
                     return ApiResult<bool>.Fail("用户名已存在");
+                }
+
+                // 验证邮箱格式
+                if (!string.IsNullOrWhiteSpace(request.Email))
+                {
+                    var emailRegex = new System.Text.RegularExpressions.Regex(@"^[^\s@]+@[^\s@]+\.[^\s@]+$");
+                    if (!emailRegex.IsMatch(request.Email))
+                    {
+                        return ApiResult<bool>.Fail("邮箱格式不正确");
+                    }
+                }
+
+                // 验证手机号格式
+                if (!string.IsNullOrWhiteSpace(request.Phone))
+                {
+                    var phoneRegex = new System.Text.RegularExpressions.Regex(@"^1[3-9]\d{9}$");
+                    if (!phoneRegex.IsMatch(request.Phone))
+                    {
+                        return ApiResult<bool>.Fail("手机号格式不正确");
+                    }
+                }
+
+                // 检查邮箱是否存在（排除当前用户）
+                if (!string.IsNullOrWhiteSpace(request.Email))
+                {
+                    var existingEmailUser = await context.Users
+                        .AsQueryable()
+                        .Where(x => x.Email == request.Email && x.Id != request.Id)
+                        .FirstAsync();
+
+                    if (existingEmailUser != null)
+                    {
+                        return ApiResult<bool>.Fail("邮箱已存在");
+                    }
+                }
+
+                // 检查手机号是否存在（排除当前用户）
+                if (!string.IsNullOrWhiteSpace(request.Phone))
+                {
+                    var existingPhoneUser = await context.Users
+                        .AsQueryable()
+                        .Where(x => x.Phone == request.Phone && x.Id != request.Id)
+                        .FirstAsync();
+
+                    if (existingPhoneUser != null)
+                    {
+                        return ApiResult<bool>.Fail("手机号已存在");
+                    }
                 }
 
                 user.UserName = request.UserName;

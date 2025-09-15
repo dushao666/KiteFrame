@@ -1,7 +1,4 @@
 using Application.Commands.User;
-using Domain.Entities;
-using Repository;
-using SqlSugar;
 
 namespace Application.Handlers.User;
 
@@ -36,8 +33,59 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, ApiRe
                     return ApiResult<long>.Fail("用户名已存在");
                 }
 
+                // 验证邮箱格式
+                if (!string.IsNullOrWhiteSpace(request.Email))
+                {
+                    var emailRegex = new System.Text.RegularExpressions.Regex(@"^[^\s@]+@[^\s@]+\.[^\s@]+$");
+                    if (!emailRegex.IsMatch(request.Email))
+                    {
+                        return ApiResult<long>.Fail("邮箱格式不正确");
+                    }
+                }
+
+                // 验证手机号格式
+                if (!string.IsNullOrWhiteSpace(request.Phone))
+                {
+                    var phoneRegex = new System.Text.RegularExpressions.Regex(@"^1[3-9]\d{9}$");
+                    if (!phoneRegex.IsMatch(request.Phone))
+                    {
+                        return ApiResult<long>.Fail("手机号格式不正确");
+                    }
+                }
+
+                // 检查邮箱是否存在
+                if (!string.IsNullOrWhiteSpace(request.Email))
+                {
+                    var existingEmailUser = await context.Users
+                        .AsQueryable()
+                        .Where(x => x.Email == request.Email)
+                        .FirstAsync();
+
+                    if (existingEmailUser != null)
+                    {
+                        return ApiResult<long>.Fail("邮箱已存在");
+                    }
+                }
+
+                // 检查手机号是否存在
+                if (!string.IsNullOrWhiteSpace(request.Phone))
+                {
+                    var existingPhoneUser = await context.Users
+                        .AsQueryable()
+                        .Where(x => x.Phone == request.Phone)
+                        .FirstAsync();
+
+                    if (existingPhoneUser != null)
+                    {
+                        return ApiResult<long>.Fail("手机号已存在");
+                    }
+                }
+
                 // 使用Mapster进行对象映射
                 var user = request.Adapt<Domain.Entities.User>();
+
+                // 加密密码 - 使用SHA512保持与登录一致
+                user.Password = EncryptionHelper.Sha512(request.Password);
 
                 var result = await context.Users.InsertReturnEntityAsync(user);
                 context.Commit();

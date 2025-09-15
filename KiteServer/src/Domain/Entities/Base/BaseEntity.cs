@@ -1,5 +1,3 @@
-using Domain.Interfaces;
-
 namespace Domain.Entities.Base;
 
 /// <summary>
@@ -10,7 +8,7 @@ public abstract class BaseEntity : IDeleted
     /// <summary>
     /// 主键ID
     /// </summary>
-    [SugarColumn(IsPrimaryKey = true)]
+    [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
     public virtual long Id { get; set; }
 
     /// <summary>
