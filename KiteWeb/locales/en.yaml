@@ -72,6 +72,11 @@ menus:
   purePermissionButton: Button Permission
   purePermissionButtonRouter: Route return button permission
   purePermissionButtonLogin: Login interface return button permission
+  pureSystem: System Management
+  pureUser: User Management
+  pureRole: Role Management
+  pureDept: Department Management
+  pureMenu: Menu Management
 status:
   pureLoad: Loading...
   pureMessage: Message
