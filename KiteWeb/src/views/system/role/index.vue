@@ -240,47 +240,46 @@
     <el-dialog
       v-model="permissionDialogVisible"
       title="分配权限"
-      width="800px"
+      width="700px"
       :close-on-click-modal="false"
     >
       <div class="permission-assignment">
-        <div class="role-info">
+        <div class="role-info" style="background: #f8f9fa; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
           <el-descriptions :column="2" border>
-            <el-descriptions-item label="角色名称">{{ currentRole?.roleName }}</el-descriptions-item>
-            <el-descriptions-item label="角色编码">{{ currentRole?.roleCode }}</el-descriptions-item>
+            <el-descriptions-item label="角色名称" align="center" label-align="center">
+              <span style="font-weight: 500;">{{ currentRole?.roleName }}</span>
+            </el-descriptions-item>
+            <el-descriptions-item label="角色编码" align="center" label-align="center">
+              <span style="font-weight: 500;">{{ currentRole?.roleCode }}</span>
+            </el-descriptions-item>
           </el-descriptions>
         </div>
         
-        <div class="menu-tree" style="margin-top: 20px;">
-          <el-tree
-            ref="menuTreeRef"
-            :data="menuTreeData"
-            :props="{ children: 'children', label: 'menuName' }"
-            show-checkbox
-            node-key="id"
-            :default-checked-keys="checkedMenuIds"
-            :default-expand-all="true"
-            check-strictly
-          >
-            <template #default="{ node, data }">
-              <span class="tree-node">
-                <el-icon v-if="data.icon">
-                  <component :is="data.icon" />
-                </el-icon>
-                <span>{{ data.menuName }}</span>
-                <el-tag v-if="data.menuType === 3" type="info" size="small" style="margin-left: 8px;">
-                  按钮
-                </el-tag>
-              </span>
-            </template>
-          </el-tree>
+        <div class="menu-selection">
+          <div style="display: flex; align-items: center; margin-bottom: 16px; padding: 12px; background: #e8f4fd; border-radius: 6px;">
+            <el-icon style="margin-right: 8px; color: #409eff;"><Setting /></el-icon>
+            <h4 style="margin: 0; color: #409eff;">菜单权限配置</h4>
+          </div>
+          <div style="border: 1px solid #e4e7ed; border-radius: 8px; padding: 16px; background: #fafafa;">
+            <el-tree
+              ref="menuTreeRef"
+              :data="menuTreeData"
+              show-checkbox
+              node-key="id"
+              :default-checked-keys="checkedMenuIds"
+              :props="{ children: 'children', label: 'menuName' }"
+              check-strictly
+              style="background: transparent;"
+            />
+          </div>
         </div>
       </div>
 
       <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="permissionDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleSaveRolePermissions" :loading="permissionAssignLoading">
+        <div class="dialog-footer" style="padding: 16px 0; border-top: 1px solid #e4e7ed; margin-top: 20px;">
+          <el-button @click="permissionDialogVisible = false" size="large">取消</el-button>
+          <el-button type="primary" @click="handleSaveRolePermissions" :loading="permissionAssignLoading" size="large">
+            <el-icon style="margin-right: 4px;"><Check /></el-icon>
             保存
           </el-button>
         </div>
@@ -292,7 +291,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { Plus, Search, Refresh, Edit, Delete, Setting } from "@element-plus/icons-vue";
+import { Plus, Search, Refresh, Edit, Delete, Setting, Check } from "@element-plus/icons-vue";
 import type { FormInstance, FormRules } from "element-plus";
 import {
   getRoles,
