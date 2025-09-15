@@ -30,10 +30,11 @@ public class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand, ApiRe
                     return ApiResult<bool>.Fail("用户不存在");
                 }
 
+                // 使用框架的逻辑删除，SqlSugar的AOP会自动设置IsDeleted=true和DeleteTime
                 var success = await context.Users.DeleteAsync(user);
                 context.Commit();
 
-                _logger.LogInformation("删除用户成功，用户ID: {UserId}, 用户名: {UserName}", request.Id, user.UserName);
+                _logger.LogInformation("逻辑删除用户成功，用户ID: {UserId}, 用户名: {UserName}", request.Id, user.UserName);
                 return success ? ApiResult<bool>.Ok(true, "删除成功") : ApiResult<bool>.Fail("删除失败");
             }
         }

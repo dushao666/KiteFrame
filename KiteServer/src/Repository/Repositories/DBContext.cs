@@ -1,5 +1,7 @@
 using Domain.Entities;
+using Domain.Entities.Base;
 using Domain.Interfaces;
+using System.Linq.Expressions;
 
 namespace Repository;
 
@@ -20,6 +22,45 @@ public class DBContext : SugarUnitOfWork
 /// <typeparam name="T">实体类型</typeparam>
 public class DbSet<T> : SimpleClient<T> where T : class, IDeleted, new()
 {
-    // 移除了逻辑删除的重写方法，因为已经在ServiceCollectionExtensions中通过AOP配置了逻辑删除
-    // 这样让DBContext更加优雅，职责更加单一
+    /// <summary>
+    /// 逻辑删除
+    /// </summary>
+    public override bool Delete(T deleteObj)
+    {
+        deleteObj.IsDeleted = true;
+        if (deleteObj is BaseEntity baseEntity)
+        {
+            baseEntity.DeleteTime = DateTime.Now;
+        }
+        return Context.Updateable(deleteObj).ExecuteCommand() > 0;
+    }
+
+    /// <summary>
+    /// 逻辑删除
+    /// </summary>
+    public override async Task<bool> DeleteAsync(T deleteObj)
+    {
+        deleteObj.IsDeleted = true;
+        if (deleteObj is BaseEntity baseEntity)
+        {
+            baseEntity.DeleteTime = DateTime.Now;
+        }
+        return await Context.Updateable(deleteObj).ExecuteCommandAsync() > 0;
+    }
+
+    /// <summary>
+    /// 逻辑删除
+    /// </summary>
+    public override bool Delete(Expression<Func<T, bool>> exp)
+    {
+        return Context.Updateable<T>().SetColumns(it => new T() { IsDeleted = true }, true).Where(exp).ExecuteCommand() > 0;
+    }
+
+    /// <summary>
+    /// 逻辑删除
+    /// </summary>
+    public override async Task<bool> DeleteAsync(Expression<Func<T, bool>> exp)
+    {
+        return await Context.Updateable<T>().SetColumns(it => new T() { IsDeleted = true }, true).Where(exp).ExecuteCommandAsync() > 0;
+    }
 }

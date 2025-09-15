@@ -75,20 +75,6 @@ public static class ServiceCollectionExtensions
                             entityInfo.SetValue(DateTime.Now);
                         }
                         break;
-                    case DataFilterType.DeleteByObject:
-                        if (entityInfo.PropertyName == "UpdateTime")
-                        {
-                            entityInfo.SetValue(DateTime.Now);
-                        }
-                        if (entityInfo.PropertyName == "DeleteTime")
-                        {
-                            entityInfo.SetValue(DateTime.Now);
-                        }
-                        if (entityInfo.PropertyName == "IsDeleted")
-                        {
-                            entityInfo.SetValue(true);
-                        }
-                        break;
                 }
             };
             
