@@ -1,3 +1,5 @@
+using Application.Queries.Permission.Interfaces;
+
 namespace Application.Handlers.Auth;
 
 /// <summary>
@@ -10,6 +12,7 @@ public class SignInCommandHandler : IRequestHandler<SignInCommand, LoginUserDto>
     private readonly ILogger<SignInCommandHandler> _logger;
     private readonly Infrastructure.Services.ICacheService _cacheService;
     private readonly IMediator _mediator;
+    private readonly IPermissionQueries _permissionQueries;
 
     /// <summary>
     /// 构造函数
@@ -19,13 +22,15 @@ public class SignInCommandHandler : IRequestHandler<SignInCommand, LoginUserDto>
         IConfiguration configuration,
         ILogger<SignInCommandHandler> logger,
         Infrastructure.Services.ICacheService cacheService,
-        IMediator mediator)
+        IMediator mediator,
+        IPermissionQueries permissionQueries)
     {
         _unitOfWork = unitOfWork;
         _configuration = configuration;
         _logger = logger;
         _cacheService = cacheService;
         _mediator = mediator;
+        _permissionQueries = permissionQueries;
     }
 
     public async Task<LoginUserDto> Handle(SignInCommand request, CancellationToken cancellationToken)
@@ -70,13 +75,22 @@ public class SignInCommandHandler : IRequestHandler<SignInCommand, LoginUserDto>
             // 生成Token
             var loginResult = await GenerateTokens(user, request.RememberMe);
 
-            // 获取用户权限信息
-            var userPermissions = await _mediator.Send(new GetUserPermissionsQuery(user.Id), cancellationToken);
-
-            // 设置权限信息
-            loginResult.Roles = userPermissions.Roles;
-            loginResult.Menus = userPermissions.Menus;
-            loginResult.Permissions = userPermissions.Permissions;
+            // 获取用户权限信息（通过 Queries，不使用 Handlers）
+            var permResult = await _permissionQueries.GetUserPermissionsAsync(user.Id);
+            if (permResult == null || !permResult.Success || permResult.Data == null)
+            {
+                _logger.LogError("获取用户权限失败，用户ID: {UserId}", user.Id);
+                loginResult.Roles = new List<RoleDto>();
+                loginResult.Menus = new List<MenuDto>();
+                loginResult.Permissions = new List<string>();
+            }
+            else
+            {
+                // 设置权限信息
+                loginResult.Roles = permResult.Data.Roles;
+                loginResult.Menus = permResult.Data.Menus;
+                loginResult.Permissions = permResult.Data.Permissions;
+            }
 
             _logger.LogInformation("用户 {UserName} 登录成功，IP: {ClientIp}", user.UserName, request.ClientIp);
 

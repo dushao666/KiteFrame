@@ -1,6 +1,6 @@
 using Shared.Models.User;
 
-namespace Application.Queries.User;
+namespace Application.Queries.User.Interfaces;
 
 /// <summary>
 /// 用户查询服务接口

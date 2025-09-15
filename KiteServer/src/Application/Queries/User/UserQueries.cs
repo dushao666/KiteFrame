@@ -1,6 +1,5 @@
-using Repository;
 using Shared.Models.User;
-using SqlSugar;
+
 
 namespace Application.Queries.User;
 

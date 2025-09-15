@@ -1,3 +1,5 @@
+using Application.Queries.User.Interfaces;
+
 namespace Api.Controllers;
 
 /// <summary>
@@ -92,7 +94,6 @@ public class UserController : ControllerBase
     [ProducesResponseType(typeof(ApiResult<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(ApiResult), StatusCodes.Status409Conflict)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> UpdateUser(long id, [FromBody] UpdateUserRequest request)
     {

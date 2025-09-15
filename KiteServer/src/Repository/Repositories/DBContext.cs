@@ -14,6 +14,26 @@ public class DBContext : SugarUnitOfWork
     /// 用户
     /// </summary>
     public DbSet<User> Users { get; set; } = null!;
+
+    /// <summary>
+    /// 角色
+    /// </summary>
+    public DbSet<Role> Roles { get; set; } = null!;
+
+    /// <summary>
+    /// 用户角色关联
+    /// </summary>
+    public SimpleClient<UserRole> UserRoles { get; set; } = null!;
+
+    /// <summary>
+    /// 菜单
+    /// </summary>
+    public DbSet<Menu> Menus { get; set; } = null!;
+
+    /// <summary>
+    /// 角色菜单关联
+    /// </summary>
+    public SimpleClient<RoleMenu> RoleMenus { get; set; } = null!;
 }
 
 /// <summary>

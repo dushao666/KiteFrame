@@ -70,7 +70,9 @@ public class MapsterConfiguration : IRegister
             .Map(dest => dest.Sort, src => src.Sort)
             .Map(dest => dest.Status, src => src.Status)
             .Map(dest => dest.DataScope, src => (int)src.DataScope)
-            .Map(dest => dest.Remark, src => src.Remark);
+            .Map(dest => dest.Remark, src => src.Remark)
+            .Map(dest => dest.CreateTime, src => src.CreateTime)
+            .Map(dest => dest.UpdateTime, src => src.UpdateTime);
 
         // 全局配置
         config.Default.PreserveReference(true); // 保持引用关系

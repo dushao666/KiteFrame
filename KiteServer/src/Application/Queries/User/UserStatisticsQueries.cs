@@ -1,7 +1,4 @@
-using Repository;
 using Shared.Models.User;
-using SqlSugar;
-
 namespace Application.Queries.User;
 
 /// <summary>
@@ -60,7 +57,7 @@ public class UserStatisticsQueries : IUserStatisticsQueries
     /// </summary>
     /// <param name="days">天数</param>
     /// <returns>注册趋势数据</returns>
-    public async Task<ApiResult<List<UserRegistrationTrendDto>>> GetRegistrationTrendAsync(int days = 30)
+    public async Task<ApiResult<List<UserRegistrationTrendDto>>> GetUserRegistrationTrendAsync(int days = 30)
     {
         try
         {

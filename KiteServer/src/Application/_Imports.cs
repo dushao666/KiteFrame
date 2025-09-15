@@ -36,7 +36,12 @@ global using Infrastructure.Extensions;
 
 // Application 命名空间
 global using Application.Commands.Auth;
+global using Application.Commands.Role;
 global using Application.Queries.Permission;
+global using Application.Queries.Role;
+global using Application.Queries.User.Interfaces;
+global using Application.Queries.Role.Interfaces;
+global using Application.Queries.Permission.Interfaces;
 
 // 数据注解
 global using System.ComponentModel.DataAnnotations;
