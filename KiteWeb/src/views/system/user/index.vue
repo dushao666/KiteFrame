@@ -44,40 +44,44 @@
           style="width: 100%"
           border
         >
-          <el-table-column prop="id" label="ID" width="80" />
-          <el-table-column prop="userName" label="用户名" width="120" />
-          <el-table-column prop="realName" label="真实姓名" width="120" />
-          <el-table-column prop="email" label="邮箱" width="180" />
-          <el-table-column prop="phone" label="手机号" width="130" />
-          <el-table-column prop="status" label="状态" width="80">
+          <el-table-column prop="id" label="ID" width="80" align="center" />
+          <el-table-column prop="userName" label="用户名" width="120" align="center" />
+          <el-table-column prop="realName" label="真实姓名" width="120" align="center" />
+          <el-table-column prop="email" label="邮箱" width="180" align="center" />
+          <el-table-column prop="phone" label="手机号" width="130" align="center" />
+          <el-table-column prop="status" label="状态" width="80" align="center">
             <template #default="{ row }">
               <el-tag :type="row.status === 1 ? 'success' : 'danger'">
                 {{ row.status === 1 ? '启用' : '禁用' }}
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="createTime" label="创建时间" width="160">
+          <el-table-column prop="createTime" label="创建时间" width="160" align="center">
             <template #default="{ row }">
               {{ formatDateTime(row.createTime) }}
             </template>
           </el-table-column>
-          <el-table-column prop="remark" label="备注" min-width="120" />
-          <el-table-column label="操作" width="180" fixed="right">
+          <el-table-column prop="remark" label="备注" min-width="120" align="center" />
+          <el-table-column label="操作" width="180" fixed="right" align="center">
             <template #default="{ row }">
-              <el-button
-                type="primary"
-                size="small"
-                @click="handleEdit(row)"
-              >
-                编辑
-              </el-button>
-              <el-button
-                type="danger"
-                size="small"
-                @click="handleDelete(row)"
-              >
-                删除
-              </el-button>
+              <div class="action-buttons">
+                <el-button
+                  type="primary"
+                  size="small"
+                  @click="handleEdit(row)"
+                >
+                  <el-icon><Edit /></el-icon>
+                  编辑
+                </el-button>
+                <el-button
+                  type="danger"
+                  size="small"
+                  @click="handleDelete(row)"
+                >
+                  <el-icon><Delete /></el-icon>
+                  删除
+                </el-button>
+              </div>
             </template>
           </el-table-column>
         </el-table>
@@ -163,7 +167,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from "vue";
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus";
-import { Plus, Search, Refresh } from "@element-plus/icons-vue";
+import { Plus, Search, Refresh, Edit, Delete } from "@element-plus/icons-vue";
 import {
   getUsers,
   getUserById,
@@ -506,5 +510,17 @@ onMounted(() => {
 
 .el-tag {
   font-weight: bold;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+.action-buttons .el-button {
+  margin: 0;
+  min-width: 70px;
 }
 </style>

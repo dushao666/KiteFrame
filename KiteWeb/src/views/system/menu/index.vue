@@ -123,17 +123,22 @@
             </template>
           </el-table-column>
           <el-table-column prop="createTime" label="创建时间" width="180" />
-          <el-table-column label="操作" width="200" fixed="right">
+          <el-table-column label="操作" width="220" fixed="right" align="center">
             <template #default="{ row }">
-              <el-button type="primary" size="small" @click="handleEdit(row)">
-                编辑
-              </el-button>
-              <el-button type="success" size="small" @click="handleAddChild(row)">
-                新增子菜单
-              </el-button>
-              <el-button type="danger" size="small" @click="handleDelete(row)">
-                删除
-              </el-button>
+              <div class="action-buttons">
+                <el-button type="primary" size="small" @click="handleEdit(row)">
+                  <el-icon><Edit /></el-icon>
+                  编辑
+                </el-button>
+                <el-button type="success" size="small" @click="handleAddChild(row)">
+                  <el-icon><Plus /></el-icon>
+                  添加子菜单
+                </el-button>
+                <el-button type="danger" size="small" @click="handleDelete(row)">
+                  <el-icon><Delete /></el-icon>
+                  删除
+                </el-button>
+              </div>
             </template>
           </el-table-column>
         </el-table>
@@ -292,7 +297,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, nextTick } from "vue";
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus";
-import { Plus, Search, Refresh, ArrowDown, ArrowUp } from "@element-plus/icons-vue";
+import { Plus, Search, Refresh, ArrowDown, ArrowUp, Edit, Delete } from "@element-plus/icons-vue";
 import IconSelector from "@/components/IconSelector/index.vue";
 import {
   getMenus,
@@ -694,6 +699,19 @@ onMounted(() => {
   display: flex;
   gap: 8px;
   align-items: center;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.action-buttons .el-button {
+  margin: 0;
+  min-width: 70px;
 }
 
 .search-container {
