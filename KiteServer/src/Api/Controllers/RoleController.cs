@@ -1,6 +1,3 @@
-using Application.Queries.Role.Interfaces;
-using Shared.Models.Role;
-
 namespace Api.Controllers;
 
 /// <summary>
@@ -12,16 +9,19 @@ namespace Api.Controllers;
 public class RoleController : ControllerBase
 {
     private readonly IRoleQueries _roleQueries;
+    private readonly IMediator _mediator;
     private readonly ILogger<RoleController> _logger;
 
     /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="roleQueries">角色查询服务</param>
+    /// <param name="mediator">中介者</param>
     /// <param name="logger">日志</param>
-    public RoleController(IRoleQueries roleQueries, ILogger<RoleController> logger)
+    public RoleController(IRoleQueries roleQueries, IMediator mediator, ILogger<RoleController> logger)
     {
         _roleQueries = roleQueries;
+        _mediator = mediator;
         _logger = logger;
     }
 
@@ -79,6 +79,75 @@ public class RoleController : ControllerBase
     public async Task<IActionResult> CheckRoleCodeExists([FromQuery] string roleCode, [FromQuery] long? excludeId = null)
     {
         var result = await _roleQueries.CheckRoleCodeExistsAsync(roleCode, excludeId);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// 创建角色
+    /// </summary>
+    /// <param name="request">创建请求</param>
+    /// <returns>角色ID</returns>
+    [HttpPost]
+    [ProducesResponseType(typeof(ApiResult<long>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> CreateRole([FromBody] CreateRoleRequest request)
+    {
+        var command = new CreateRoleCommand
+        {
+            RoleName = request.RoleName,
+            RoleCode = request.RoleCode,
+            Sort = request.Sort,
+            Status = request.Status,
+            DataScope = (DataScope)request.DataScope,
+            Remark = request.Remark
+        };
+
+        var result = await _mediator.Send(command);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// 更新角色
+    /// </summary>
+    /// <param name="id">角色ID</param>
+    /// <param name="request">更新请求</param>
+    /// <returns>是否成功</returns>
+    [HttpPut("{id}")]
+    [ProducesResponseType(typeof(ApiResult<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResult), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> UpdateRole(long id, [FromBody] UpdateRoleRequest request)
+    {
+        var command = new UpdateRoleCommand
+        {
+            Id = id,
+            RoleName = request.RoleName,
+            RoleCode = request.RoleCode,
+            Sort = request.Sort,
+            Status = request.Status,
+            DataScope = (DataScope)request.DataScope,
+            Remark = request.Remark
+        };
+
+        var result = await _mediator.Send(command);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// 删除角色
+    /// </summary>
+    /// <param name="id">角色ID</param>
+    /// <returns>是否成功</returns>
+    [HttpDelete("{id}")]
+    [ProducesResponseType(typeof(ApiResult<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResult), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> DeleteRole(long id)
+    {
+        var command = new DeleteRoleCommand(id);
+        var result = await _mediator.Send(command);
         return Ok(result);
     }
 }
