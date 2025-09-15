@@ -1,7 +1,4 @@
 using Application.Commands.User;
-using Repository;
-using SqlSugar;
-
 namespace Application.Handlers.User;
 
 /// <summary>
@@ -20,6 +17,8 @@ public class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand, ApiRe
 
     public async Task<ApiResult<bool>> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
     {
+        _logger.LogOperationStart("删除用户", new { UserId = request.Id });
+
         try
         {
             using (var context = _unitOfWork.CreateContext())
@@ -27,6 +26,7 @@ public class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand, ApiRe
                 var user = await context.Users.GetByIdAsync(request.Id);
                 if (user == null)
                 {
+                    _logger.LogBusinessWarning("尝试删除不存在的用户，用户ID: {UserId}", request.Id);
                     return ApiResult<bool>.Fail("用户不存在");
                 }
 
@@ -34,13 +34,21 @@ public class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand, ApiRe
                 var success = await context.Users.DeleteAsync(user);
                 context.Commit();
 
-                _logger.LogInformation("逻辑删除用户成功，用户ID: {UserId}, 用户名: {UserName}", request.Id, user.UserName);
-                return success ? ApiResult<bool>.Ok(true, "删除成功") : ApiResult<bool>.Fail("删除失败");
+                if (success)
+                {
+                    _logger.LogOperationSuccess("删除用户", new { UserId = request.Id, UserName = user.UserName });
+                    return ApiResult<bool>.Ok(true, "删除成功");
+                }
+                else
+                {
+                    _logger.LogBusinessWarning("删除用户操作失败，用户ID: {UserId}, 用户名: {UserName}", request.Id, user.UserName);
+                    return ApiResult<bool>.Fail("删除失败");
+                }
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "删除用户失败，用户ID: {UserId}", request.Id);
+            _logger.LogOperationError("删除用户", ex, new { UserId = request.Id });
             return ApiResult<bool>.Fail("删除用户失败");
         }
     }
