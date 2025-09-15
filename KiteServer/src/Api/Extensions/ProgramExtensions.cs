@@ -1,4 +1,3 @@
-
 namespace Api.Extensions;
 
 /// <summary>
@@ -74,7 +73,29 @@ public static class ProgramExtensions
         app.UseSwaggerMiddleware(app.Configuration);
 
         // 使用 Serilog 请求日志
-        app.UseSerilogRequestLogging();
+        app.UseSerilogRequestLogging(options =>
+        {
+            // 自定义请求日志格式
+            options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+
+            // 只记录错误和成功的请求
+            options.GetLevel = (httpContext, elapsed, ex) => ex != null
+                ? LogEventLevel.Error
+                : httpContext.Response.StatusCode > 499
+                    ? LogEventLevel.Error
+                    : LogEventLevel.Information;
+
+            // 增强日志属性
+            options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+            {
+                diagnosticContext.Set("RequestHost", httpContext.Request.Host.Value);
+                diagnosticContext.Set("RequestScheme", httpContext.Request.Scheme);
+                if (httpContext.User.Identity?.IsAuthenticated == true)
+                {
+                    diagnosticContext.Set("UserName", httpContext.User.Identity.Name);
+                }
+            };
+        });
 
         // 使用 CORS
         app.UseCorsMiddleware();

@@ -24,6 +24,7 @@ global using Swashbuckle.AspNetCore.Annotations;
 
 // Serilog
 global using Serilog;
+global using Serilog.Events;
 
 // Microsoft Extensions
 global using Microsoft.Extensions.Configuration;
