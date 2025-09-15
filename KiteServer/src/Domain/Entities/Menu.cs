@@ -28,7 +28,7 @@ public class Menu : BaseEntity
     /// 菜单类型（1：目录，2：菜单，3：按钮）
     /// </summary>
     [SugarColumn(ColumnDescription = "菜单类型")]
-    public MenuType MenuType { get; set; } = MenuType.Menu;
+    public Shared.Enums.MenuType MenuType { get; set; } = Shared.Enums.MenuType.Menu;
 
     /// <summary>
     /// 路由路径
@@ -101,25 +101,4 @@ public class Menu : BaseEntity
     /// </summary>
     [SugarColumn(IsIgnore = true)]
     public Menu? Parent { get; set; }
-}
-
-/// <summary>
-/// 菜单类型枚举
-/// </summary>
-public enum MenuType
-{
-    /// <summary>
-    /// 目录
-    /// </summary>
-    Directory = 1,
-
-    /// <summary>
-    /// 菜单
-    /// </summary>
-    Menu = 2,
-
-    /// <summary>
-    /// 按钮
-    /// </summary>
-    Button = 3
 }

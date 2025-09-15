@@ -28,7 +28,7 @@ public class MenuDto
     /// <summary>
     /// 菜单类型（1：目录，2：菜单，3：按钮）
     /// </summary>
-    public int MenuType { get; set; }
+    public Shared.Enums.MenuType MenuType { get; set; }
 
     /// <summary>
     /// 路由路径
@@ -79,6 +79,16 @@ public class MenuDto
     /// 备注
     /// </summary>
     public string? Remark { get; set; }
+
+    /// <summary>
+    /// 创建时间
+    /// </summary>
+    public DateTime CreateTime { get; set; }
+
+    /// <summary>
+    /// 更新时间
+    /// </summary>
+    public DateTime UpdateTime { get; set; }
 
     /// <summary>
     /// 子菜单列表

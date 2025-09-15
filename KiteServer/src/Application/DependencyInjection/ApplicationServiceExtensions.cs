@@ -34,14 +34,14 @@ public static class ApplicationServiceExtensions
     /// <returns></returns>
     private static IServiceCollection AddQueryServices(this IServiceCollection services)
     {
-        // 也可以使用自动扫描注册（备用方案）
+        // 自动扫描注册
         RegisterQueriesByConvention(services);
 
         return services;
     }
     
     /// <summary>
-    /// 按约定自动注册查询服务（备用方案）
+    /// 按约定自动注册查询服务
     /// </summary>
     /// <param name="services">服务集合</param>
     private static void RegisterQueriesByConvention(IServiceCollection services)

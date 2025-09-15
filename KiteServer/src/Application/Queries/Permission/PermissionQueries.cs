@@ -64,7 +64,7 @@ public class PermissionQueries : IPermissionQueries
 
             // 获取角色对应的菜单
             var roleMenus = await context.Db.Queryable<RoleMenu>()
-                .LeftJoin<Menu>((rm, m) => rm.MenuId == m.Id)
+                .LeftJoin<MenuEntity>((rm, m) => rm.MenuId == m.Id)
                 .Where((rm, m) => roleIds.Contains(rm.RoleId) && m.Status == 1)
                 .Select((rm, m) => m)
                 .ToListAsync();
@@ -122,7 +122,7 @@ public class PermissionQueries : IPermissionQueries
 
             // 获取角色对应的菜单
             var menus = await context.Db.Queryable<RoleMenu>()
-                .LeftJoin<Menu>((rm, m) => rm.MenuId == m.Id)
+                .LeftJoin<MenuEntity>((rm, m) => rm.MenuId == m.Id)
                 .Where((rm, m) => roleIds.Contains(rm.RoleId) && m.Status == 1 && m.IsVisible == true)
                 .Select((rm, m) => m)
                 .ToListAsync();
@@ -165,7 +165,7 @@ public class PermissionQueries : IPermissionQueries
 
             // 检查权限
             var hasPermission = await context.Db.Queryable<RoleMenu>()
-                .LeftJoin<Menu>((rm, m) => rm.MenuId == m.Id)
+                .LeftJoin<MenuEntity>((rm, m) => rm.MenuId == m.Id)
                 .Where((rm, m) => roleIds.Contains(rm.RoleId) && m.Status == 1)
                 .Where((rm, m) => !string.IsNullOrEmpty(m.Permissions) && m.Permissions.Contains(permission))
                 .AnyAsync();

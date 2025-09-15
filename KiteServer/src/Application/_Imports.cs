@@ -37,8 +37,12 @@ global using Infrastructure.Extensions;
 // Application 命名空间
 global using Application.Commands.Auth;
 global using Application.Commands.Role;
+global using Application.Commands.Menu;
 global using Application.Queries.Permission;
 global using Application.Queries.Role;
+global using Application.Queries.Menu.Interfaces;
+global using MenuEntity = Domain.Entities.Menu;
+global using MenuDto = Shared.Models.Dtos.MenuDto;
 global using Application.Queries.User.Interfaces;
 global using Application.Queries.Role.Interfaces;
 global using Application.Queries.Permission.Interfaces;
