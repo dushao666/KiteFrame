@@ -4,8 +4,8 @@
       <template #header>
         <div class="card-header">
           <span>用户管理</span>
-          <el-button 
-            type="primary" 
+          <el-button
+            type="primary"
             @click="handleAdd"
             v-permission="'system:user:add'"
           >
@@ -191,7 +191,7 @@
             <el-descriptions-item label="真实姓名">{{ currentUser?.realName }}</el-descriptions-item>
           </el-descriptions>
         </div>
-        
+
         <div class="role-selection" style="margin-top: 20px; display: flex; align-items: stretch; gap: 20px;">
           <!-- 可选角色区域 -->
           <div style="flex: 1; display: flex; flex-direction: column;">
@@ -207,29 +207,29 @@
               </div>
             </div>
           </div>
-          
+
           <!-- 中间操作按钮区域 -->
-          <div style="display: flex; flex-direction: column; justify-content: center; align-items: stretch; gap: 16px; padding: 20px 0; min-width: 120px;">
-            <el-button 
-              type="primary" 
+          <div style="display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 10px; padding: 0 10px;">
+            <el-button
+              type="primary"
               @click="handleAssignSelectedRoles"
               :disabled="!availableRoles.length"
               :icon="ArrowRight"
-              style="width: 100px; height: 40px; align-self: center;"
+              style="width: 80px; height: 40px;"
             >
               分配
             </el-button>
-            <el-button 
-              type="danger" 
+            <el-button
+              type="danger"
               @click="handleRemoveSelectedRoles"
               :disabled="!assignedRoles.length"
               :icon="ArrowLeft"
-              style="width: 100px; height: 40px; align-self: center;"
+              style="width: 80px; height: 40px;"
             >
               移除
             </el-button>
           </div>
-          
+
           <!-- 已分配角色区域 -->
           <div style="flex: 1; display: flex; flex-direction: column;">
             <h4 style="margin-bottom: 10px; color: #606266;">已分配角色</h4>
@@ -573,12 +573,12 @@ const handleSubmit = async () => {
 const handleAssignRole = async (row: UserData) => {
   try {
     currentUser.value = row;
-    
+
     // 清空之前的数据
     selectedRoleIds.value = [];
     availableRoles.value = [];
     assignedRoles.value = [];
-    
+
     // 获取所有角色列表
     await fetchAllRoles();
     // 获取用户已分配的角色
@@ -609,7 +609,7 @@ const fetchAllRoles = async () => {
 const fetchUserRoles = async (userId: number) => {
   try {
     const response = await getUserRoles(userId);
-    
+
     if (response.success && response.data) {
       selectedRoleIds.value = response.data;
     } else {
@@ -647,15 +647,15 @@ const handleSaveUserRoles = async () => {
     ElMessage.warning("请先选择用户");
     return;
   }
-  
+
   try {
     roleAssignLoading.value = true;
     const response = await assignUserRoles(currentUser.value.id, selectedRoleIds.value);
-    
+
     if (response && response.success) {
       ElMessage.success("角色分配成功");
       roleDialogVisible.value = false;
-      
+
       // 刷新用户列表以显示最新的角色信息
       fetchUsers();
     } else {

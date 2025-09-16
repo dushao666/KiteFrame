@@ -276,6 +276,19 @@
             <h4 style="margin: 0; color: #409eff;">菜单权限配置</h4>
           </div>
           <div style="border: 1px solid #e4e7ed; border-radius: 8px; padding: 16px; background: #fafafa;">
+            <div style="margin-bottom: 12px; padding: 8px; background: #f0f9ff; border-radius: 4px; font-size: 13px; color: #666;">
+              <el-icon style="margin-right: 4px; color: #409eff;"><InfoFilled /></el-icon>
+              父子节点联动：选中父节点将自动选中所有子节点，取消父节点将自动取消所有子节点
+            </div>
+            
+            <!-- 快捷操作按钮 -->
+            <div style="margin-bottom: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
+              <el-button size="small" @click="handleCheckAll">全选</el-button>
+              <el-button size="small" @click="handleUncheckAll">全不选</el-button>
+              <el-button size="small" @click="handleExpandAll">展开全部</el-button>
+              <el-button size="small" @click="handleCollapseAll">折叠全部</el-button>
+            </div>
+            
             <el-tree
               ref="menuTreeRef"
               :data="menuTreeData"
@@ -283,8 +296,9 @@
               node-key="id"
               :default-checked-keys="checkedMenuIds"
               :props="{ children: 'children', label: 'menuName' }"
-              check-strictly
+              default-expand-all
               style="background: transparent;"
+              @check="handleMenuCheck"
             />
           </div>
         </div>
@@ -308,7 +322,7 @@
 <script setup lang="ts">
 import {ref, reactive, onMounted} from "vue";
 import {ElMessage, ElMessageBox} from "element-plus";
-import {Plus, Search, Refresh, Edit, Delete, Setting, Check} from "@element-plus/icons-vue";
+import {Plus, Search, Refresh, Edit, Delete, Setting, Check, InfoFilled} from "@element-plus/icons-vue";
 import type {FormInstance, FormRules} from "element-plus";
 import {
   getRoles,
@@ -322,6 +336,7 @@ import {
   type CreateRoleRequest,
   type UpdateRoleRequest
 } from "@/api/role";
+import { getAllMenus, getRoleMenuIds, assignRolePermissions } from "@/api/permission";
 
 defineOptions({
   name: "SystemRole"
@@ -611,29 +626,89 @@ const handleAssignPermission = async (row: RoleData) => {
 
 // 获取菜单树数据
 const fetchMenuTree = async () => {
-  // 这里需要调用菜单树API，暂时使用模拟数据
-  menuTreeData.value = [
-    {
-      id: 1,
-      menuName: "系统管理",
-      menuType: 1,
-      icon: "Setting",
-      children: [
-        {id: 2, menuName: "用户管理", menuType: 2, icon: "User"},
-        {id: 3, menuName: "角色管理", menuType: 2, icon: "Avatar"},
-        {id: 4, menuName: "菜单管理", menuType: 2, icon: "Menu"},
-        {id: 5, menuName: "新增用户", menuType: 3, parentId: 2},
-        {id: 6, menuName: "编辑用户", menuType: 3, parentId: 2},
-        {id: 7, menuName: "删除用户", menuType: 3, parentId: 2}
-      ]
+  try {
+    const result = await getAllMenus();
+    if (result.success && result.data) {
+      menuTreeData.value = result.data;
+    } else {
+      ElMessage.error(result.message || "获取菜单数据失败");
     }
-  ];
+  } catch (error) {
+    console.error("获取菜单数据失败:", error);
+    ElMessage.error("获取菜单数据失败");
+  }
 };
 
 // 获取角色已分配的权限
 const fetchRolePermissions = async (roleId: number) => {
-  // 这里需要调用角色权限关联API，暂时使用模拟数据
-  checkedMenuIds.value = [2, 3, 5, 6]; // 假设角色已分配这些权限
+  try {
+    const result = await getRoleMenuIds(roleId);
+    if (result.success && result.data) {
+      checkedMenuIds.value = result.data;
+    } else {
+      ElMessage.error(result.message || "获取角色权限失败");
+    }
+  } catch (error) {
+    console.error("获取角色权限失败:", error);
+    ElMessage.error("获取角色权限失败");
+  }
+};
+
+// 菜单选择处理（父子级联动）
+const handleMenuCheck = (data: any, checked: any) => {
+  // Element Plus Tree 组件已经内置了父子联动逻辑
+  // 当 check-strictly 为 false 时（默认），会自动处理父子节点联动
+  // 这里可以添加额外的业务逻辑，比如记录操作日志等
+};
+
+// 获取所有菜单节点的ID
+const getAllMenuIds = (menus: any[]): number[] => {
+  const ids: number[] = [];
+  const traverse = (nodes: any[]) => {
+    nodes.forEach(node => {
+      ids.push(node.id);
+      if (node.children && node.children.length > 0) {
+        traverse(node.children);
+      }
+    });
+  };
+  traverse(menus);
+  return ids;
+};
+
+// 全选
+const handleCheckAll = () => {
+  if (menuTreeRef.value && menuTreeData.value) {
+    const allIds = getAllMenuIds(menuTreeData.value);
+    menuTreeRef.value.setCheckedKeys(allIds);
+  }
+};
+
+// 全不选
+const handleUncheckAll = () => {
+  if (menuTreeRef.value) {
+    menuTreeRef.value.setCheckedKeys([]);
+  }
+};
+
+// 展开全部
+const handleExpandAll = () => {
+  if (menuTreeRef.value && menuTreeData.value) {
+    const allIds = getAllMenuIds(menuTreeData.value);
+    allIds.forEach(id => {
+      menuTreeRef.value.getNode(id)?.expand();
+    });
+  }
+};
+
+// 折叠全部
+const handleCollapseAll = () => {
+  if (menuTreeRef.value && menuTreeData.value) {
+    const allIds = getAllMenuIds(menuTreeData.value);
+    allIds.forEach(id => {
+      menuTreeRef.value.getNode(id)?.collapse();
+    });
+  }
 };
 
 // 保存角色权限分配
@@ -643,19 +718,20 @@ const handleSaveRolePermissions = async () => {
   try {
     permissionAssignLoading.value = true;
 
-    // 获取选中的菜单ID
+    // 获取选中的菜单ID（包含半选状态的父节点）
     const checkedKeys = menuTreeRef.value.getCheckedKeys();
     const halfCheckedKeys = menuTreeRef.value.getHalfCheckedKeys();
     const allSelectedKeys = [...checkedKeys, ...halfCheckedKeys];
 
-    // 这里需要调用保存角色权限的API
-    console.log("保存角色权限:", {
-      roleId: currentRole.value.id,
-      menuIds: allSelectedKeys
-    });
-
-    ElMessage.success("权限分配成功");
-    permissionDialogVisible.value = false;
+    // 调用保存角色权限的API
+    const result = await assignRolePermissions(currentRole.value.id, allSelectedKeys);
+    
+    if (result.success) {
+      ElMessage.success("权限分配成功");
+      permissionDialogVisible.value = false;
+    } else {
+      ElMessage.error(result.message || "权限分配失败");
+    }
   } catch (error) {
     console.error("保存角色权限失败:", error);
     ElMessage.error("保存角色权限失败");

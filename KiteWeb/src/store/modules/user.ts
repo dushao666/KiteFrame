@@ -84,37 +84,37 @@ export const useUserStore = defineStore("user", () => {
 
   // ==================== 原有方法（保持兼容性） ====================
   
-  /** 存储头像 */
+    /** 存储头像 */
   const SET_AVATAR = (newAvatar: string) => {
     avatar.value = newAvatar;
   };
 
-  /** 存储用户名 */
+    /** 存储用户名 */
   const SET_USERNAME = (newUsername: string) => {
     username.value = newUsername;
   };
 
-  /** 存储昵称 */
+    /** 存储昵称 */
   const SET_NICKNAME = (newNickname: string) => {
     nickname.value = newNickname;
   };
 
-  /** 存储角色 */
+    /** 存储角色 */
   const SET_ROLES = (newRoles: Array<string>) => {
     roles.value = newRoles;
   };
 
-  /** 存储按钮级别权限 */
+    /** 存储按钮级别权限 */
   const SET_PERMS = (newPermissions: Array<string>) => {
     permissions.value = newPermissions;
   };
 
-  /** 存储是否勾选了登录页的免登录 */
+    /** 存储是否勾选了登录页的免登录 */
   const SET_ISREMEMBERED = (bool: boolean) => {
     isRemembered.value = bool;
   };
 
-  /** 设置登录页的免登录存储几天 */
+    /** 设置登录页的免登录存储几天 */
   const SET_LOGINDAY = (value: number) => {
     loginDay.value = Number(value);
   };
@@ -276,29 +276,29 @@ export const useUserStore = defineStore("user", () => {
 
   // ==================== 登录/登出方法 ====================
   
-  /** 登入 */
+    /** 登入 */
   const loginByUsername = async (data: LoginRequest): Promise<UserResult> => {
-    return new Promise<UserResult>((resolve, reject) => {
-      getLogin(data)
+      return new Promise<UserResult>((resolve, reject) => {
+        getLogin(data)
         .then(async response => {
-          if (response?.success && response.data) {
-            // 提取角色和权限信息
+            if (response?.success && response.data) {
+              // 提取角色和权限信息
             const roleCodes = response.data.roles?.map(role => role.roleCode) || [];
             const userPermissions = response.data.permissions || [];
 
-            // 设置token到本地存储
-            setToken({
-              accessToken: response.data.accessToken,
-              refreshToken: response.data.refreshToken,
+              // 设置token到本地存储
+              setToken({
+                accessToken: response.data.accessToken,
+                refreshToken: response.data.refreshToken,
               expires: new Date(response.data.expiresAt),
-              username: response.data.userName,
-              nickname: response.data.realName || response.data.userName,
-              avatar: response.data.avatar || "",
+                username: response.data.userName,
+                nickname: response.data.realName || response.data.userName,
+                avatar: response.data.avatar || "",
               roles: roleCodes,
               permissions: userPermissions
-            });
+              });
 
-            // 更新store状态
+              // 更新store状态
             SET_USERNAME(response.data.userName);
             SET_NICKNAME(response.data.realName || response.data.userName);
             SET_AVATAR(response.data.avatar || "");
@@ -328,13 +328,13 @@ export const useUserStore = defineStore("user", () => {
             } catch (error) {
               console.warn("获取详细权限信息失败，使用登录返回的权限数据:", error);
             }
-          }
-          resolve(response);
-        })
-        .catch(error => {
-          reject(error);
-        });
-    });
+            }
+            resolve(response);
+          })
+          .catch(error => {
+            reject(error);
+          });
+      });
   };
 
   /** 清除用户数据 */
@@ -356,46 +356,46 @@ export const useUserStore = defineStore("user", () => {
     removeToken();
   };
 
-  /** 登出 */
+    /** 登出 */
   const logOut = async () => {
-    try {
-      // 调用后台登出接口
-      await logout();
-    } catch (error) {
-      console.warn("登出接口调用失败:", error);
-    } finally {
-      // 清理本地状态
+      try {
+        // 调用后台登出接口
+        await logout();
+      } catch (error) {
+        console.warn("登出接口调用失败:", error);
+      } finally {
+        // 清理本地状态
       clearUserData();
-      useMultiTagsStoreHook().handleTags("equal", [...routerArrays]);
-      resetRouter();
-      router.push("/login");
-    }
+        useMultiTagsStoreHook().handleTags("equal", [...routerArrays]);
+        resetRouter();
+        router.push("/login");
+      }
   };
 
-  /** 刷新`token` */
+    /** 刷新`token` */
   const handRefreshToken = async (data: RefreshTokenRequest): Promise<RefreshTokenResult> => {
-    return new Promise<RefreshTokenResult>((resolve, reject) => {
-      refreshTokenApi(data)
-        .then(response => {
-          if (response?.success && response.data) {
-            // 更新token
-            const currentToken = getToken();
-            if (currentToken) {
-              setToken({
-                ...currentToken,
-                accessToken: response.data.accessToken,
-                refreshToken: response.data.refreshToken,
+      return new Promise<RefreshTokenResult>((resolve, reject) => {
+        refreshTokenApi(data)
+          .then(response => {
+            if (response?.success && response.data) {
+              // 更新token
+              const currentToken = getToken();
+              if (currentToken) {
+                setToken({
+                  ...currentToken,
+                  accessToken: response.data.accessToken,
+                  refreshToken: response.data.refreshToken,
                 expires: new Date(response.data.expiresAt)
-              });
+                });
               setTokenValue(response.data.accessToken);
+              }
+              resolve(response);
             }
-            resolve(response);
-          }
-        })
-        .catch(error => {
-          reject(error);
-        });
-    });
+          })
+          .catch(error => {
+            reject(error);
+          });
+      });
   };
 
   // ==================== 返回状态和方法 ====================

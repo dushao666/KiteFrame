@@ -95,4 +95,16 @@ export const getAllMenus = () => {
  */
 export const getRoleMenuIds = (roleId: number) => {
   return http.request<RoleMenuIdsResult>("get", `/permission/role/${roleId}/menus`);
+};
+
+/**
+ * 分配角色权限
+ * @param roleId 角色ID
+ * @param menuIds 菜单ID列表
+ * @returns 分配结果
+ */
+export const assignRolePermissions = (roleId: number, menuIds: number[]) => {
+  return http.request<ApiResult<boolean>>("post", `/role/${roleId}/permissions`, {
+    data: { roleId, menuIds }
+  });
 }; 

@@ -150,4 +150,26 @@ public class RoleController : ControllerBase
         var result = await _mediator.Send(command);
         return Ok(result);
     }
+
+    /// <summary>
+    /// 分配角色权限
+    /// </summary>
+    /// <param name="roleId">角色ID</param>
+    /// <param name="request">权限分配请求</param>
+    /// <returns>分配结果</returns>
+    [HttpPost("{roleId}/permissions")]
+    [ProducesResponseType(typeof(ApiResult<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> AssignRolePermissions(long roleId, [FromBody] AssignRolePermissionsRequest request)
+    {
+        var command = new AssignRolePermissionsCommand
+        {
+            RoleId = roleId,
+            MenuIds = request.MenuIds
+        };
+
+        var result = await _mediator.Send(command);
+        return Ok(result);
+    }
 }
