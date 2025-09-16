@@ -127,7 +127,7 @@ export const deleteRole = (id: number) => {
   return http.request<DeleteRoleResult>("delete", `/role/${id}`);
 };
 
-/** 获取所有启用的角色列表（用于下拉选择） */
+/** 获取所有启用的角色列表（用于角色分配） */
 export const getEnabledRoles = () => {
   return http.request<EnabledRolesResult>("get", "/role/enabled");
 };

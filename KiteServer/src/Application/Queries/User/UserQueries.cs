@@ -93,4 +93,41 @@ public class UserQueries : IUserQueries
             return ApiResult<UserDto>.Fail("获取用户失败");
         }
     }
+
+    /// <summary>
+    /// 获取用户已分配的角色ID列表
+    /// </summary>
+    /// <param name="userId">用户ID</param>
+    /// <returns>角色ID列表</returns>
+    public async Task<ApiResult<List<long>>> GetUserRoleIdsAsync(long userId)
+    {
+        try
+        {
+            using var context = _unitOfWork.CreateContext(false);
+
+            // 检查用户是否存在
+            var userExists = await context.Db.Queryable<Domain.Entities.User>()
+                .Where(u => u.Id == userId && u.IsDeleted == false)
+                .AnyAsync();
+
+            if (!userExists)
+            {
+                return ApiResult<List<long>>.Fail("用户不存在");
+            }
+
+            // 获取用户的角色ID列表
+            var roleIds = await context.Db.Queryable<UserRole>()
+                .LeftJoin<Domain.Entities.Role>((ur, r) => ur.RoleId == r.Id)
+                .Where((ur, r) => ur.UserId == userId && r.Status == 1)
+                .Select((ur, r) => ur.RoleId)
+                .ToListAsync();
+
+            return ApiResult<List<long>>.Ok(roleIds, "获取成功");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "获取用户角色列表失败，用户ID: {UserId}", userId);
+            return ApiResult<List<long>>.Fail("获取用户角色列表失败");
+        }
+    }
 }

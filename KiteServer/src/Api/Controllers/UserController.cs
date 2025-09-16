@@ -127,5 +127,44 @@ public class UserController : ControllerBase
         return Ok(result);
     }
 
+    /// <summary>
+    /// 获取用户已分配的角色ID列表
+    /// </summary>
+    /// <param name="id">用户ID</param>
+    /// <returns>角色ID列表</returns>
+    [HttpGet("{id}/roles")]
+    [ProducesResponseType(typeof(ApiResult<List<long>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResult), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetUserRoles(long id)
+    {
+        var result = await _userQueries.GetUserRoleIdsAsync(id);
+        return Ok(result);
+    }
 
+    /// <summary>
+    /// 分配用户角色
+    /// </summary>
+    /// <param name="id">用户ID</param>
+    /// <param name="request">角色分配请求</param>
+    /// <returns>分配结果</returns>
+    [HttpPost("{id}/roles")]
+    [ProducesResponseType(typeof(ApiResult<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResult), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> AssignUserRoles(long id, [FromBody] AssignUserRolesRequest request)
+    {
+        // 确保路径参数和请求体中的用户ID一致
+        request.UserId = id;
+
+        var command = new AssignUserRolesCommand
+        {
+            UserId = request.UserId,
+            RoleIds = request.RoleIds
+        };
+
+        var result = await _mediator.Send(command);
+        return Ok(result);
+    }
 }

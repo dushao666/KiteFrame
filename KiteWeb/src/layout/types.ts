@@ -78,6 +78,8 @@ export type menuType = {
   parentId?: number;
   pathList?: number[];
   redirect?: string;
+  query?: Record<string, any>;
+  params?: Record<string, any>;
 };
 
 export type themeColorsType = {

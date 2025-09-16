@@ -192,10 +192,11 @@
           </el-descriptions>
         </div>
         
-        <div class="role-selection" style="margin-top: 20px; display: flex; gap: 20px;">
-          <div style="flex: 1;">
-            <h4 style="margin-bottom: 10px;">可选角色</h4>
-            <div style="border: 1px solid #dcdfe6; border-radius: 4px; padding: 10px; min-height: 200px; max-height: 300px; overflow-y: auto;">
+        <div class="role-selection" style="margin-top: 20px; display: flex; align-items: stretch; gap: 20px;">
+          <!-- 可选角色区域 -->
+          <div style="flex: 1; display: flex; flex-direction: column;">
+            <h4 style="margin-bottom: 10px; color: #606266;">可选角色</h4>
+            <div style="border: 1px solid #dcdfe6; border-radius: 4px; padding: 10px; min-height: 250px; max-height: 300px; overflow-y: auto; flex: 1; background-color: #fafafa;">
               <el-checkbox-group v-model="availableRoles">
                 <div v-for="role in allRoles.filter(r => !selectedRoleIds.includes(r.id))" :key="role.id" style="margin-bottom: 8px;">
                   <el-checkbox :value="role.id" :label="role.roleName" />
@@ -205,20 +206,34 @@
                 暂无可分配角色
               </div>
             </div>
-            <div style="margin-top: 10px; text-align: center;">
-              <el-button 
-                type="primary" 
-                @click="handleAssignSelectedRoles"
-                :disabled="!availableRoles.length"
-              >
-                分配 →
-              </el-button>
-            </div>
           </div>
           
-          <div style="flex: 1;">
-            <h4 style="margin-bottom: 10px;">已分配角色</h4>
-            <div style="border: 1px solid #dcdfe6; border-radius: 4px; padding: 10px; min-height: 200px; max-height: 300px; overflow-y: auto;">
+          <!-- 中间操作按钮区域 -->
+          <div style="display: flex; flex-direction: column; justify-content: center; align-items: stretch; gap: 16px; padding: 20px 0; min-width: 120px;">
+            <el-button 
+              type="primary" 
+              @click="handleAssignSelectedRoles"
+              :disabled="!availableRoles.length"
+              :icon="ArrowRight"
+              style="width: 100px; height: 40px; align-self: center;"
+            >
+              分配
+            </el-button>
+            <el-button 
+              type="danger" 
+              @click="handleRemoveSelectedRoles"
+              :disabled="!assignedRoles.length"
+              :icon="ArrowLeft"
+              style="width: 100px; height: 40px; align-self: center;"
+            >
+              移除
+            </el-button>
+          </div>
+          
+          <!-- 已分配角色区域 -->
+          <div style="flex: 1; display: flex; flex-direction: column;">
+            <h4 style="margin-bottom: 10px; color: #606266;">已分配角色</h4>
+            <div style="border: 1px solid #dcdfe6; border-radius: 4px; padding: 10px; min-height: 250px; max-height: 300px; overflow-y: auto; flex: 1; background-color: #f0f9ff;">
               <el-checkbox-group v-model="assignedRoles">
                 <div v-for="role in allRoles.filter(r => selectedRoleIds.includes(r.id))" :key="role.id" style="margin-bottom: 8px;">
                   <el-checkbox :value="role.id" :label="role.roleName" />
@@ -227,15 +242,6 @@
               <div v-if="selectedRoleIds.length === 0" style="color: #909399; text-align: center; padding: 20px;">
                 暂无已分配角色
               </div>
-            </div>
-            <div style="margin-top: 10px; text-align: center;">
-              <el-button 
-                type="danger" 
-                @click="handleRemoveSelectedRoles"
-                :disabled="!assignedRoles.length"
-              >
-                ← 移除
-              </el-button>
             </div>
           </div>
         </div>
@@ -256,18 +262,21 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from "vue";
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus";
-import { Plus, Search, Refresh, Edit, Delete, Key } from "@element-plus/icons-vue";
+import { Plus, Search, Refresh, Edit, Delete, Key, ArrowRight, ArrowLeft } from "@element-plus/icons-vue";
 import {
   getUsers,
   getUserById,
   createUser,
   updateUser,
   deleteUser,
+  getUserRoles,
+  assignUserRoles,
   type UserData,
   type GetUsersRequest,
   type CreateUserRequest,
   type UpdateUserRequest
 } from "@/api/user";
+import { getEnabledRoles, type RoleData } from "@/api/role";
 
 defineOptions({
   name: "SystemUser"
@@ -286,7 +295,7 @@ const formRef = ref<FormInstance>();
 const roleDialogVisible = ref(false);
 const roleAssignLoading = ref(false);
 const currentUser = ref<UserData | null>(null);
-const allRoles = ref<any[]>([]);
+const allRoles = ref<RoleData[]>([]);
 const selectedRoleIds = ref<number[]>([]);
 const availableRoles = ref<number[]>([]);
 const assignedRoles = ref<number[]>([]);
@@ -564,6 +573,12 @@ const handleSubmit = async () => {
 const handleAssignRole = async (row: UserData) => {
   try {
     currentUser.value = row;
+    
+    // 清空之前的数据
+    selectedRoleIds.value = [];
+    availableRoles.value = [];
+    assignedRoles.value = [];
+    
     // 获取所有角色列表
     await fetchAllRoles();
     // 获取用户已分配的角色
@@ -577,18 +592,37 @@ const handleAssignRole = async (row: UserData) => {
 
 // 获取所有角色
 const fetchAllRoles = async () => {
-  // 这里需要调用角色API，暂时使用模拟数据
-  allRoles.value = [
-    { id: 1, roleName: "超级管理员", disabled: false },
-    { id: 2, roleName: "系统管理员", disabled: false },
-    { id: 3, roleName: "普通用户", disabled: false }
-  ];
+  try {
+    const response = await getEnabledRoles();
+    if (response.success && response.data) {
+      allRoles.value = response.data;
+    } else {
+      ElMessage.error(response.message || "获取角色列表失败");
+    }
+  } catch (error) {
+    console.error("获取角色列表失败:", error);
+    ElMessage.error("获取角色列表失败");
+  }
 };
 
 // 获取用户已分配的角色
 const fetchUserRoles = async (userId: number) => {
-  // 这里需要调用用户角色关联API，暂时使用模拟数据
-  selectedRoleIds.value = [3]; // 假设用户已分配普通用户角色
+  try {
+    const response = await getUserRoles(userId);
+    
+    if (response.success && response.data) {
+      selectedRoleIds.value = response.data;
+    } else {
+      selectedRoleIds.value = []; // 确保清空
+      if (response.message && response.message !== "获取成功") {
+        ElMessage.error(response.message || "获取用户角色失败");
+      }
+    }
+  } catch (error) {
+    console.error("获取用户角色失败:", error);
+    ElMessage.error("获取用户角色失败");
+    selectedRoleIds.value = []; // 确保清空
+  }
 };
 
 // 分配选中的角色
@@ -609,22 +643,30 @@ const handleRemoveSelectedRoles = () => {
 
 // 保存用户角色分配
 const handleSaveUserRoles = async () => {
-  if (!currentUser.value) return;
+  if (!currentUser.value) {
+    ElMessage.warning("请先选择用户");
+    return;
+  }
   
   try {
     roleAssignLoading.value = true;
+    const response = await assignUserRoles(currentUser.value.id, selectedRoleIds.value);
     
-    // 这里需要调用保存用户角色的API
-    console.log("保存用户角色:", {
-      userId: currentUser.value.id,
-      roleIds: selectedRoleIds.value
-    });
-    
-    ElMessage.success("角色分配成功");
-    roleDialogVisible.value = false;
-  } catch (error) {
-    console.error("保存用户角色失败:", error);
-    ElMessage.error("保存用户角色失败");
+    if (response && response.success) {
+      ElMessage.success("角色分配成功");
+      roleDialogVisible.value = false;
+      
+      // 刷新用户列表以显示最新的角色信息
+      fetchUsers();
+    } else {
+      ElMessage.error(response?.message || "角色分配失败");
+    }
+  } catch (error: any) {
+    if (error.message && error.message.includes("fetch")) {
+      ElMessage.warning("网络请求失败，请检查后端服务是否启动");
+    } else {
+      ElMessage.error("角色分配失败: " + (error.message || "未知错误"));
+    }
   } finally {
     roleAssignLoading.value = false;
   }

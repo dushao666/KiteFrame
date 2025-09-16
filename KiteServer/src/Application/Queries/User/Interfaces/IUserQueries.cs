@@ -20,4 +20,11 @@ public interface IUserQueries
     /// <param name="id">用户ID</param>
     /// <returns>用户信息</returns>
     Task<ApiResult<UserDto>> GetUserByIdAsync(long id);
+
+    /// <summary>
+    /// 获取用户已分配的角色ID列表
+    /// </summary>
+    /// <param name="userId">用户ID</param>
+    /// <returns>角色ID列表</returns>
+    Task<ApiResult<List<long>>> GetUserRoleIdsAsync(long userId);
 }

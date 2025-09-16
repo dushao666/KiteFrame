@@ -260,3 +260,17 @@ export const updateUser = (id: number, data: UpdateUserRequest) => {
 export const deleteUser = (id: number) => {
   return http.request<DeleteUserResult>("delete", `/user/${id}`);
 };
+
+// 用户角色分配相关接口
+
+/** 获取用户已分配的角色ID列表 */
+export const getUserRoles = (userId: number) => {
+  return http.request<ApiResult<number[]>>("get", `/user/${userId}/roles`);
+};
+
+/** 分配用户角色 */
+export const assignUserRoles = (userId: number, roleIds: number[]) => {
+  return http.request<ApiResult<boolean>>("post", `/user/${userId}/roles`, {
+    data: { userId, roleIds }
+  });
+};

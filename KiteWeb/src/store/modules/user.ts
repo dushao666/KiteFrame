@@ -251,49 +251,39 @@ export const useUserStore = defineStore("user", () => {
     try {
       // 从token中获取用户信息
       const tokenData = getToken();
-      if (tokenData && tokenData.username) {
-        // 模拟用户信息（实际应该从API获取）
-        const mockUserInfo: UserInfo = {
-          id: 1, // 这里应该从token或API获取真实的用户ID
-          userName: tokenData.username,
-          realName: tokenData.nickname || tokenData.username,
-          email: "",
-          phone: "",
-          avatar: tokenData.avatar || ""
-        };
-        
-        setUserInfo(mockUserInfo);
+      console.log("🔍 初始化权限 - token数据:", tokenData);
+      
+      if (tokenData && tokenData.username && tokenData.accessToken) {
+        // 恢复基本的token和用户状态
         setTokenValue(tokenData.accessToken);
         
-        // 获取用户权限信息
-        await fetchUserPermissions();
-      } else {
-        // 如果没有token信息，设置默认权限（用于开发测试）
-        const mockPermissions = [
-          "system:user:view",
-          "system:user:add", 
-          "system:user:edit",
-          "system:user:delete",
-          "system:user:assign",
-          "system:role:view",
-          "system:role:add",
-          "system:role:edit", 
-          "system:role:delete",
-          "system:role:assign",
-          "system:menu:view",
-          "system:menu:add",
-          "system:menu:edit",
-          "system:menu:delete"
-        ];
-        setPermissions(mockPermissions);
+        // 设置基本的状态信息（从token中获取）
+        SET_USERNAME(tokenData.username);
+        SET_NICKNAME(tokenData.nickname || tokenData.username);
+        SET_AVATAR(tokenData.avatar || "");
         
-        // 设置管理员角色
-        setRoles([
-          { id: 1, roleName: "系统管理员", roleCode: "admin" }
-        ]);
+        // 如果token中有角色和权限信息，先设置这些信息
+        if (tokenData.roles && tokenData.roles.length > 0) {
+          SET_ROLES(tokenData.roles);
+          console.log("✅ 恢复角色信息:", tokenData.roles);
+        }
+        if (tokenData.permissions && tokenData.permissions.length > 0) {
+          SET_PERMS(tokenData.permissions);
+          console.log("✅ 恢复权限信息:", tokenData.permissions);
+        }
+        
+        console.log("✅ 用户权限初始化成功，用户:", tokenData.username);
+      } else {
+        console.log("⚠️ 未找到有效的token信息");
+        console.log("  - tokenData存在:", !!tokenData);
+        console.log("  - username存在:", !!(tokenData?.username));
+        console.log("  - accessToken存在:", !!(tokenData?.accessToken));
+        
+        // 不调用clearUserData()，避免清空可能存在的用户状态
       }
     } catch (error) {
-      console.error("初始化用户权限失败:", error);
+      console.error("❌ 初始化用户权限失败:", error);
+      // 初始化失败时也不清空用户数据，让路由守卫来处理
     }
   };
 
@@ -345,9 +335,9 @@ export const useUserStore = defineStore("user", () => {
               setRoles(response.data.roles);
             }
             
-            // 初始化权限数据
+            // 初始化权限数据 - 使用明确的用户ID
             try {
-              await fetchUserPermissions();
+              await fetchUserPermissions(userInfoData.id);
             } catch (error) {
               console.warn("获取详细权限信息失败，使用登录返回的权限数据:", error);
             }
