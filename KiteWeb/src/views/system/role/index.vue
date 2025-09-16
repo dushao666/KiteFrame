@@ -129,7 +129,7 @@
         </el-table>
 
         <!-- 分页 -->
-        <div class="pagination-container">
+        <div class="pagination-container" v-if="pagination.total > 0">
           <el-pagination
             :current-page="pagination.pageIndex"
             :page-size="pagination.pageSize"
@@ -729,6 +729,11 @@ const handleSaveRolePermissions = async () => {
     if (result.success) {
       ElMessage.success("权限分配成功");
       permissionDialogVisible.value = false;
+      
+      // 刷新页面以更新权限状态
+      setTimeout(() => {
+        window.location.reload();
+      }, 500); // 延迟500ms刷新，确保用户看到成功提示
     } else {
       ElMessage.error(result.message || "权限分配失败");
     }

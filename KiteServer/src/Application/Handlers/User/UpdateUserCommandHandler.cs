@@ -88,10 +88,10 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, ApiRe
                 }
 
                 user.UserName = request.UserName;
-                user.Email = request.Email;
-                user.Phone = request.Phone;
+                user.Email = string.IsNullOrWhiteSpace(request.Email) ? null : request.Email;
+                user.Phone = string.IsNullOrWhiteSpace(request.Phone) ? null : request.Phone;
                 user.RealName = request.RealName;
-                user.DingTalkId = request.DingTalkId;
+                user.DingTalkId = string.IsNullOrWhiteSpace(request.DingTalkId) ? null : request.DingTalkId;
                 user.Status = request.Status;
                 user.Remark = request.Remark;
 

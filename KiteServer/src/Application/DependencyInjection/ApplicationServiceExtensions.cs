@@ -3,6 +3,7 @@ using System.Reflection;
 using Application.Queries.User;
 using Application.Queries.Role;
 using Application.Queries.Permission;
+using Application.Queries.Monitor;
 
 namespace Application.DependencyInjection;
 

@@ -366,3 +366,81 @@ INSERT INTO `sys_role_menu` (`RoleId`, `MenuId`, `CreateUserId`) VALUES
 -- 普通用户只有基础查看权限
 (3, 1, 1), (3, 39, 1), (3, 40, 1), (3, 41, 1);
 
+-- ========================================
+-- 系统监控相关表
+-- ========================================
+
+-- 在线用户表
+CREATE TABLE `sys_online_user` (
+  `Id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `SessionId` varchar(200) NOT NULL COMMENT '用户会话ID',
+  `UserId` bigint NOT NULL COMMENT '用户ID',
+  `UserName` varchar(50) NOT NULL COMMENT '用户名',
+  `RealName` varchar(50) DEFAULT NULL COMMENT '真实姓名',
+  `DeptId` bigint DEFAULT NULL COMMENT '部门ID',
+  `DeptName` varchar(50) DEFAULT NULL COMMENT '部门名称',
+  `IpAddress` varchar(50) DEFAULT NULL COMMENT 'IP地址',
+  `IpLocation` varchar(200) DEFAULT NULL COMMENT 'IP归属地',
+  `Browser` varchar(50) DEFAULT NULL COMMENT '浏览器类型',
+  `Os` varchar(50) DEFAULT NULL COMMENT '操作系统',
+  `LoginTime` datetime NOT NULL COMMENT '登录时间',
+  `LastAccessTime` datetime NOT NULL COMMENT '最后访问时间',
+  `ExpireTime` datetime NOT NULL COMMENT '过期时间',
+  `Status` int NOT NULL DEFAULT '1' COMMENT '状态（1：在线，0：离线）',
+  `CreateTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `UpdateTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`Id`),
+  UNIQUE KEY `UK_SessionId` (`SessionId`),
+  KEY `IDX_UserId` (`UserId`),
+  KEY `IDX_LoginTime` (`LoginTime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='在线用户表';
+
+-- 登录日志表
+CREATE TABLE `sys_login_log` (
+  `Id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `UserId` bigint DEFAULT NULL COMMENT '用户ID',
+  `UserName` varchar(50) DEFAULT NULL COMMENT '用户名',
+  `IpAddress` varchar(50) DEFAULT NULL COMMENT 'IP地址',
+  `IpLocation` varchar(200) DEFAULT NULL COMMENT 'IP归属地',
+  `Browser` varchar(50) DEFAULT NULL COMMENT '浏览器类型',
+  `Os` varchar(50) DEFAULT NULL COMMENT '操作系统',
+  `Status` int NOT NULL COMMENT '登录状态（1：成功，0：失败）',
+  `Message` varchar(500) DEFAULT NULL COMMENT '提示消息',
+  `LoginTime` datetime NOT NULL COMMENT '登录时间',
+  `CreateTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`Id`),
+  KEY `IDX_UserId` (`UserId`),
+  KEY `IDX_UserName` (`UserName`),
+  KEY `IDX_Status` (`Status`),
+  KEY `IDX_LoginTime` (`LoginTime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='登录日志表';
+
+-- 操作日志表
+CREATE TABLE `sys_operation_log` (
+  `Id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `UserId` bigint DEFAULT NULL COMMENT '用户ID',
+  `UserName` varchar(50) DEFAULT NULL COMMENT '用户名',
+  `Module` varchar(50) DEFAULT NULL COMMENT '模块名称',
+  `BusinessType` varchar(50) DEFAULT NULL COMMENT '业务类型',
+  `Method` varchar(200) DEFAULT NULL COMMENT '方法名称',
+  `RequestMethod` varchar(10) DEFAULT NULL COMMENT '请求方式',
+  `OperatorType` int DEFAULT '1' COMMENT '操作类别（1：管理员，2：用户）',
+  `OperUrl` varchar(500) DEFAULT NULL COMMENT '请求URL',
+  `OperIp` varchar(50) DEFAULT NULL COMMENT '主机地址',
+  `OperLocation` varchar(200) DEFAULT NULL COMMENT '操作地点',
+  `OperParam` text COMMENT '请求参数',
+  `JsonResult` text COMMENT '返回参数',
+  `Status` int NOT NULL DEFAULT '1' COMMENT '操作状态（1：正常，0：异常）',
+  `ErrorMsg` text COMMENT '错误消息',
+  `OperTime` datetime NOT NULL COMMENT '操作时间',
+  `CostTime` bigint DEFAULT NULL COMMENT '消耗时间（毫秒）',
+  `CreateTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`Id`),
+  KEY `IDX_UserId` (`UserId`),
+  KEY `IDX_UserName` (`UserName`),
+  KEY `IDX_Module` (`Module`),
+  KEY `IDX_BusinessType` (`BusinessType`),
+  KEY `IDX_Status` (`Status`),
+  KEY `IDX_OperTime` (`OperTime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='操作日志表';
+

@@ -84,6 +84,14 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, ApiRe
                 // 使用Mapster进行对象映射
                 var user = request.Adapt<Domain.Entities.User>();
 
+                // 处理可空字段：将空字符串转换为 null，避免唯一键约束冲突
+                if (string.IsNullOrWhiteSpace(user.DingTalkId))
+                    user.DingTalkId = null;
+                if (string.IsNullOrWhiteSpace(user.Email))
+                    user.Email = null;
+                if (string.IsNullOrWhiteSpace(user.Phone))
+                    user.Phone = null;
+
                 // 加密密码 - 使用SHA512保持与登录一致
                 user.Password = EncryptionHelper.Sha512(request.Password);
 

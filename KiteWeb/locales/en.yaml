@@ -77,6 +77,10 @@ menus:
   pureRole: Role Management
   pureDept: Department Management
   pureMenu: Menu Management
+  pureMonitor: System Monitor
+  pureOnlineUser: Online Users
+  pureLoginLog: Login Logs
+  pureOperLog: Operation Logs
 status:
   pureLoad: Loading...
   pureMessage: Message
