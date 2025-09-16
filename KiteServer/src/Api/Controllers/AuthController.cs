@@ -35,8 +35,9 @@ public class AuthController : ControllerBase
     {
         try
         {
-            // 获取客户端IP地址
+            // 获取客户端IP地址和用户代理信息
             command.ClientIp = GetClientIpAddress();
+            command.UserAgent = HttpContext.Request.Headers["User-Agent"].FirstOrDefault();
 
             var result = await _mediator.Send(command);
 
@@ -72,8 +73,37 @@ public class AuthController : ControllerBase
     {
         try
         {
-            // 这里可以添加登出逻辑，如清除缓存等
-            return Ok(ApiResult.Ok("登出成功"));
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userName = User.FindFirst(ClaimTypes.Name)?.Value;
+            
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(userName))
+            {
+                return Unauthorized(ApiResult.Fail("用户未登录"));
+            }
+
+            // 从请求头获取RefreshToken作为SessionId
+            var refreshToken = HttpContext.Request.Headers["Authorization"]
+                .FirstOrDefault()?.Replace("Bearer ", "");
+
+            var command = new SignOutCommand
+            {
+                UserId = long.Parse(userId),
+                UserName = userName,
+                SessionId = refreshToken ?? string.Empty,
+                ClientIp = GetClientIpAddress(),
+                LogoutType = 1 // 主动退出
+            };
+
+            var result = await _mediator.Send(command);
+            
+            if (result)
+            {
+                return Ok(ApiResult.Ok("登出成功"));
+            }
+            else
+            {
+                return StatusCode(500, ApiResult.Fail("登出失败"));
+            }
         }
         catch (Exception ex)
         {

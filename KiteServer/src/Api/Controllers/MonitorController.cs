@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Attributes;
+using Shared.Events;
 
 namespace Api.Controllers;
 
@@ -9,9 +11,11 @@ namespace Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
+[OperationLog("系统监控", "监控管理")]
 public class MonitorController : ControllerBase
 {
     private readonly IMonitorQueries _monitorQueries;
+    private readonly IMediator _mediator;
     private readonly ILogger<MonitorController> _logger;
 
     /// <summary>
@@ -19,9 +23,11 @@ public class MonitorController : ControllerBase
     /// </summary>
     public MonitorController(
         IMonitorQueries monitorQueries,
+        IMediator mediator,
         ILogger<MonitorController> logger)
     {
         _monitorQueries = monitorQueries;
+        _mediator = mediator;
         _logger = logger;
     }
 
@@ -46,6 +52,7 @@ public class MonitorController : ControllerBase
     /// <param name="sessionId">会话ID</param>
     /// <returns>操作结果</returns>
     [HttpPost("online/logout/{sessionId}")]
+    [OperationLog("在线用户", "强制下线")]
     [ProducesResponseType(typeof(ApiResult<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
@@ -56,6 +63,29 @@ public class MonitorController : ControllerBase
             return BadRequest(ApiResult.Fail("会话ID不能为空"));
         }
 
+        // 先获取在线用户信息
+        var onlineUserResult = await _monitorQueries.GetOnlineUserBySessionIdAsync(sessionId);
+        if (!onlineUserResult.Success || onlineUserResult.Data == null)
+        {
+            return BadRequest(ApiResult.Fail("用户不存在或已下线"));
+        }
+
+        var onlineUser = onlineUserResult.Data;
+
+        // 发布用户强制下线事件
+        var logoutEvent = new UserLogoutEvent
+        {
+            UserId = onlineUser.UserId,
+            UserName = onlineUser.UserName,
+            SessionId = sessionId,
+            IpAddress = onlineUser.IpAddress,
+            LogoutType = 2, // 强制下线
+            LogoutTime = DateTime.Now
+        };
+
+        await _mediator.Publish(logoutEvent);
+
+        // 执行强制下线操作
         var result = await _monitorQueries.ForceLogoutAsync(sessionId);
         return Ok(result);
     }

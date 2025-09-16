@@ -1,4 +1,5 @@
 using Application.Queries.Permission.Interfaces;
+using Shared.Events;
 
 namespace Application.Handlers.Auth;
 
@@ -92,12 +93,18 @@ public class SignInCommandHandler : IRequestHandler<SignInCommand, LoginUserDto>
                 loginResult.Permissions = permResult.Data.Permissions;
             }
 
+            // 发布用户登录成功事件
+            await PublishLoginEventAsync(user, request, loginResult, 1, "登录成功");
+
             _logger.LogInformation("用户 {UserName} 登录成功，IP: {ClientIp}", user.UserName, request.ClientIp);
 
             return loginResult;
         }
         catch (Exception ex)
         {
+            // 发布用户登录失败事件
+            await PublishLoginEventAsync(null, request, null, 0, ex.Message);
+            
             _logger.LogError(ex, "用户登录失败: {Message}", ex.Message);
             throw;
         }
@@ -260,5 +267,93 @@ public class SignInCommandHandler : IRequestHandler<SignInCommand, LoginUserDto>
             LastLoginTime = user.LastLoginTime,
             LastLoginIp = user.LastLoginIp
         };
+    }
+
+    /// <summary>
+    /// 发布用户登录事件
+    /// </summary>
+    private async Task PublishLoginEventAsync(Domain.Entities.User? user, SignInCommand request, LoginUserDto? loginResult, int status, string message)
+    {
+        try
+        {
+            var loginEvent = new UserLoginEvent
+            {
+                UserId = user?.Id ?? 0,
+                UserName = user?.UserName ?? request.UserName,
+                RealName = user?.RealName,
+                DeptId = null, // TODO: 添加部门字段到User实体
+                DeptName = null, // TODO: 添加部门字段到User实体
+                SessionId = loginResult?.RefreshToken ?? string.Empty,
+                IpAddress = request.ClientIp,
+                IpLocation = await GetIpLocationAsync(request.ClientIp),
+                Browser = await GetBrowserInfoAsync(request.UserAgent),
+                Os = await GetOsInfoAsync(request.UserAgent),
+                LoginType = request.Type,
+                Status = status,
+                Message = message,
+                LoginTime = DateTime.Now,
+                ExpireTime = loginResult?.ExpiresAt ?? DateTime.Now
+            };
+
+            await _mediator.Publish(loginEvent);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "发布用户登录事件失败");
+        }
+    }
+
+    /// <summary>
+    /// 获取IP归属地
+    /// </summary>
+    private async Task<string?> GetIpLocationAsync(string? ipAddress)
+    {
+        // TODO: 实现IP归属地查询逻辑
+        // 可以使用第三方API或本地IP库
+        return await Task.FromResult("未知");
+    }
+
+    /// <summary>
+    /// 获取浏览器信息
+    /// </summary>
+    private async Task<string?> GetBrowserInfoAsync(string? userAgent)
+    {
+        if (string.IsNullOrEmpty(userAgent))
+            return await Task.FromResult("未知");
+
+        // 简单的浏览器识别逻辑
+        if (userAgent.Contains("Chrome"))
+            return await Task.FromResult("Chrome");
+        if (userAgent.Contains("Firefox"))
+            return await Task.FromResult("Firefox");
+        if (userAgent.Contains("Safari"))
+            return await Task.FromResult("Safari");
+        if (userAgent.Contains("Edge"))
+            return await Task.FromResult("Edge");
+
+        return await Task.FromResult("其他");
+    }
+
+    /// <summary>
+    /// 获取操作系统信息
+    /// </summary>
+    private async Task<string?> GetOsInfoAsync(string? userAgent)
+    {
+        if (string.IsNullOrEmpty(userAgent))
+            return await Task.FromResult("未知");
+
+        // 简单的操作系统识别逻辑
+        if (userAgent.Contains("Windows"))
+            return await Task.FromResult("Windows");
+        if (userAgent.Contains("Mac"))
+            return await Task.FromResult("macOS");
+        if (userAgent.Contains("Linux"))
+            return await Task.FromResult("Linux");
+        if (userAgent.Contains("Android"))
+            return await Task.FromResult("Android");
+        if (userAgent.Contains("iOS"))
+            return await Task.FromResult("iOS");
+
+        return await Task.FromResult("其他");
     }
 }

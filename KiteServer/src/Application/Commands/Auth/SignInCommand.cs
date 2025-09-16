@@ -49,4 +49,9 @@ public class SignInCommand : IRequest<LoginUserDto>
     /// 记住我
     /// </summary>
     public bool RememberMe { get; set; } = false;
+
+    /// <summary>
+    /// 用户代理信息
+    /// </summary>
+    public string? UserAgent { get; set; }
 }

@@ -49,8 +49,12 @@ public static class ProgramExtensions
         // 添加 JWT 认证
         builder.Services.AddJwtAuthentication(builder.Configuration);
 
-        // 添加控制器
-        builder.Services.AddControllers();
+        // 添加控制器和过滤器
+        builder.Services.AddControllers(options =>
+        {
+            // 注册操作日志过滤器
+            options.Filters.Add<Infrastructure.Filters.OperationLogFilter>();
+        });
 
         // 添加 Swagger 文档
         builder.Services.AddSwaggerServices(builder.Configuration);
