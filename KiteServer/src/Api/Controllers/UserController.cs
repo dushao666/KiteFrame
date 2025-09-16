@@ -1,5 +1,3 @@
-using Application.Queries.User.Interfaces;
-
 namespace Api.Controllers;
 
 /// <summary>

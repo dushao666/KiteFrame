@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { useUserStore } from "@/stores/user";
+import { useUserStore } from "@/store/modules/user";
 
 interface Props {
   // 权限标识，可以是菜单编码或按钮权限标识
@@ -54,14 +54,12 @@ const hasPermission = computed(() => {
 
   // 检查单个角色
   if (props.role) {
-    roleChecks.push(userRoles.some(r => r.roleCode === props.role));
+    roleChecks.push(userRoles.includes(props.role));
   }
 
   // 检查多个角色
   if (props.roles?.length) {
-    const hasAnyRole = props.roles.some(role => 
-      userRoles.some(r => r.roleCode === role)
-    );
+    const hasAnyRole = props.roles.some(role => userRoles.includes(role));
     roleChecks.push(hasAnyRole);
   }
 

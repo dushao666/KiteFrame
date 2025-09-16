@@ -63,4 +63,5 @@ global using Application.Queries.Permission.Interfaces;
 global using Shared.Models.User;
 global using Shared.Models.Role;
 global using Shared.Models.Menu;
+global using Shared.Models.Permission;
 global using MenuDto = Shared.Models.Dtos.MenuDto;

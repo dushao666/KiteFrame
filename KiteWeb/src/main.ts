@@ -28,7 +28,7 @@ const app = createApp(App);
 // 自定义指令
 import * as directives from "@/directives";
 import { permission, permissionDisabled } from "@/directives/permission";
-import { useUserStore } from "@/stores/user";
+import { useUserStore } from "@/store/modules/user";
 Object.keys(directives).forEach(key => {
   app.directive(key, (directives as { [key: string]: Directive })[key]);
 });

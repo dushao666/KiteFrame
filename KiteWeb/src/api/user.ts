@@ -231,7 +231,7 @@ export type UpdateUserRequest = {
 
 // API 返回类型定义
 export type UsersResult = ApiResult<PagedResult<UserData>>;
-export type UserResult = ApiResult<UserData>;
+export type UserDetailResult = ApiResult<UserData>;
 export type CreateUserResult = ApiResult<number>;
 export type UpdateUserResult = ApiResult<boolean>;
 export type DeleteUserResult = ApiResult<boolean>;

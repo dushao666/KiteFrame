@@ -1,5 +1,5 @@
 import type { Directive, DirectiveBinding } from "vue";
-import { useUserStore } from "@/stores/user";
+import { useUserStore } from "@/store/modules/user";
 
 interface PermissionValue {
   permission?: string;
@@ -39,14 +39,12 @@ function checkPermission(value: string | PermissionValue): boolean {
 
   // 检查单个角色
   if (role) {
-    roleChecks.push(userRoles.some(r => r.roleCode === role));
+    roleChecks.push(userRoles.includes(role));
   }
 
   // 检查多个角色
   if (roles?.length) {
-    const hasAnyRole = roles.some(roleCode => 
-      userRoles.some(r => r.roleCode === roleCode)
-    );
+    const hasAnyRole = roles.some(roleCode => userRoles.includes(roleCode));
     roleChecks.push(hasAnyRole);
   }
 

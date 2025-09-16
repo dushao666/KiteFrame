@@ -138,16 +138,18 @@ export const checkRoleCodeExists = (roleCode: string, excludeId?: number) => {
   if (excludeId) {
     params.excludeId = excludeId;
   }
-  return http.request<CheckRoleCodeResult>("get", "/role/check-code", { params });
+  return http.request<CheckRoleCodeResult>("get", "/role/check-code", {
+    params
+  });
 };
 
 // 数据权限范围枚举
 export const DataScopeEnum = {
-  ALL: 1,        // 全部数据权限
-  CUSTOM: 2,     // 自定数据权限
-  DEPT: 3,       // 部门数据权限
+  ALL: 1, // 全部数据权限
+  CUSTOM: 2, // 自定数据权限
+  DEPT: 3, // 部门数据权限
   DEPT_AND_SUB: 4, // 部门及以下数据权限
-  SELF: 5        // 仅本人数据权限
+  SELF: 5 // 仅本人数据权限
 };
 
 // 数据权限范围选项
@@ -161,12 +163,12 @@ export const dataScopeOptions = [
 
 // 状态枚举
 export const StatusEnum = {
-  ENABLED: 1,   // 启用
-  DISABLED: 0   // 禁用
+  ENABLED: 1, // 启用
+  DISABLED: 0 // 禁用
 };
 
 // 状态选项
 export const statusOptions = [
   { label: "启用", value: StatusEnum.ENABLED },
   { label: "禁用", value: StatusEnum.DISABLED }
-]; 
+];
