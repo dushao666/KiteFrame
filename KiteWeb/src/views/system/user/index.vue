@@ -82,7 +82,7 @@
                   type="warning"
                   size="small"
                   @click="handleAssignRole(row)"
-                  v-permission="'system:user:assign'"
+                  v-permission="'system:user:role'"
                 >
                   <el-icon><Key /></el-icon>
                   分配角色

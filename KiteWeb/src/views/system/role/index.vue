@@ -97,7 +97,7 @@
                   type="warning"
                   size="small"
                   @click="handleAssignPermission(row)"
-                  v-permission="'system:role:assign'"
+                  v-permission="'system:role:permission'"
                 >
                   <el-icon><Setting /></el-icon>
                   分配权限

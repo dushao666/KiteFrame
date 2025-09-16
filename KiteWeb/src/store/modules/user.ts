@@ -251,7 +251,6 @@ export const useUserStore = defineStore("user", () => {
     try {
       // 从token中获取用户信息
       const tokenData = getToken();
-      console.log("🔍 初始化权限 - token数据:", tokenData);
       
       if (tokenData && tokenData.username && tokenData.accessToken) {
         // 恢复基本的token和用户状态
@@ -265,25 +264,13 @@ export const useUserStore = defineStore("user", () => {
         // 如果token中有角色和权限信息，先设置这些信息
         if (tokenData.roles && tokenData.roles.length > 0) {
           SET_ROLES(tokenData.roles);
-          console.log("✅ 恢复角色信息:", tokenData.roles);
         }
         if (tokenData.permissions && tokenData.permissions.length > 0) {
           SET_PERMS(tokenData.permissions);
-          console.log("✅ 恢复权限信息:", tokenData.permissions);
         }
-        
-        console.log("✅ 用户权限初始化成功，用户:", tokenData.username);
-      } else {
-        console.log("⚠️ 未找到有效的token信息");
-        console.log("  - tokenData存在:", !!tokenData);
-        console.log("  - username存在:", !!(tokenData?.username));
-        console.log("  - accessToken存在:", !!(tokenData?.accessToken));
-        
-        // 不调用clearUserData()，避免清空可能存在的用户状态
       }
     } catch (error) {
-      console.error("❌ 初始化用户权限失败:", error);
-      // 初始化失败时也不清空用户数据，让路由守卫来处理
+      console.error("初始化用户权限失败:", error);
     }
   };
 
