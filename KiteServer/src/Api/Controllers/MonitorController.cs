@@ -1,8 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Shared.Attributes;
-using Shared.Events;
-
 namespace Api.Controllers;
 
 /// <summary>

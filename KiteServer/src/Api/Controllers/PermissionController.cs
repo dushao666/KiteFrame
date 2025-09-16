@@ -1,6 +1,3 @@
-using Application.Queries.Permission.Interfaces;
-using Shared.Models.Permission;
-
 namespace Api.Controllers;
 
 /// <summary>

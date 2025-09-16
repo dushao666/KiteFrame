@@ -34,6 +34,8 @@ global using Microsoft.Extensions.Options;
 
 // MediatR
 global using MediatR;
+global using Shared.Attributes;
+global using Shared.Events;
 
 // 项目特定命名空间
 global using Shared.Configuration;

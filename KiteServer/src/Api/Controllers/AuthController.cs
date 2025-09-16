@@ -1,6 +1,3 @@
-
-using Application.Queries.Permission.Interfaces;
-
 namespace Api.Controllers;
 
 /// <summary>
