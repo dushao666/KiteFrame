@@ -4,12 +4,14 @@
       <template #header>
         <div class="card-header">
           <span>角色管理</span>
-          <el-button 
-            type="primary" 
+          <el-button
+            type="primary"
             @click="handleAdd"
             v-permission="'system:role:add'"
           >
-            <el-icon><Plus /></el-icon>
+            <el-icon>
+              <Plus/>
+            </el-icon>
             新增角色
           </el-button>
         </div>
@@ -34,17 +36,21 @@
               clearable
               style="width: 120px"
             >
-              <el-option label="启用" :value="1" />
-              <el-option label="禁用" :value="0" />
+              <el-option label="启用" :value="1"/>
+              <el-option label="禁用" :value="0"/>
             </el-select>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="handleSearch">
-              <el-icon><Search /></el-icon>
+              <el-icon>
+                <Search/>
+              </el-icon>
               搜索
             </el-button>
             <el-button @click="handleReset">
-              <el-icon><Refresh /></el-icon>
+              <el-icon>
+                <Refresh/>
+              </el-icon>
               重置
             </el-button>
           </el-form-item>
@@ -59,10 +65,10 @@
           style="width: 100%"
           border
         >
-          <el-table-column prop="id" label="ID" width="80" align="center" />
-          <el-table-column prop="roleName" label="角色名称" width="150" align="center" />
-          <el-table-column prop="roleCode" label="角色编码" width="150" align="center" />
-          <el-table-column prop="sort" label="排序" width="80" align="center" />
+          <el-table-column prop="id" label="ID" width="80" align="center"/>
+          <el-table-column prop="roleName" label="角色名称" width="150" align="center"/>
+          <el-table-column prop="roleCode" label="角色编码" width="150" align="center"/>
+          <el-table-column prop="sort" label="排序" width="80" align="center"/>
           <el-table-column prop="status" label="状态" width="80" align="center">
             <template #default="{ row }">
               <el-tag :type="row.status === 1 ? 'success' : 'danger'">
@@ -80,7 +86,7 @@
               {{ formatDateTime(row.createTime) }}
             </template>
           </el-table-column>
-          <el-table-column prop="remark" label="备注" min-width="120" align="center" />
+          <el-table-column prop="remark" label="备注" min-width="120" align="center"/>
           <el-table-column label="操作" width="280" fixed="right" align="center">
             <template #default="{ row }">
               <div class="action-buttons">
@@ -90,7 +96,9 @@
                   @click="handleEdit(row)"
                   v-permission="'system:role:edit'"
                 >
-                  <el-icon><Edit /></el-icon>
+                  <el-icon>
+                    <Edit/>
+                  </el-icon>
                   编辑
                 </el-button>
                 <el-button
@@ -99,7 +107,9 @@
                   @click="handleAssignPermission(row)"
                   v-permission="'system:role:permission'"
                 >
-                  <el-icon><Setting /></el-icon>
+                  <el-icon>
+                    <Setting/>
+                  </el-icon>
                   分配权限
                 </el-button>
                 <el-button
@@ -108,7 +118,9 @@
                   @click="handleDelete(row)"
                   v-permission="'system:role:delete'"
                 >
-                  <el-icon><Delete /></el-icon>
+                  <el-icon>
+                    <Delete/>
+                  </el-icon>
                   删除
                 </el-button>
               </div>
@@ -254,10 +266,13 @@
             </el-descriptions-item>
           </el-descriptions>
         </div>
-        
+
         <div class="menu-selection">
-          <div style="display: flex; align-items: center; margin-bottom: 16px; padding: 12px; background: #e8f4fd; border-radius: 6px;">
-            <el-icon style="margin-right: 8px; color: #409eff;"><Setting /></el-icon>
+          <div
+            style="display: flex; align-items: center; margin-bottom: 16px; padding: 12px; background: #e8f4fd; border-radius: 6px;">
+            <el-icon style="margin-right: 8px; color: #409eff;">
+              <Setting/>
+            </el-icon>
             <h4 style="margin: 0; color: #409eff;">菜单权限配置</h4>
           </div>
           <div style="border: 1px solid #e4e7ed; border-radius: 8px; padding: 16px; background: #fafafa;">
@@ -279,7 +294,9 @@
         <div class="dialog-footer" style="padding: 16px 0; border-top: 1px solid #e4e7ed; margin-top: 20px;">
           <el-button @click="permissionDialogVisible = false" size="large">取消</el-button>
           <el-button type="primary" @click="handleSaveRolePermissions" :loading="permissionAssignLoading" size="large">
-            <el-icon style="margin-right: 4px;"><Check /></el-icon>
+            <el-icon style="margin-right: 4px;">
+              <Check/>
+            </el-icon>
             保存
           </el-button>
         </div>
@@ -289,10 +306,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from "vue";
-import { ElMessage, ElMessageBox } from "element-plus";
-import { Plus, Search, Refresh, Edit, Delete, Setting, Check } from "@element-plus/icons-vue";
-import type { FormInstance, FormRules } from "element-plus";
+import {ref, reactive, onMounted} from "vue";
+import {ElMessage, ElMessageBox} from "element-plus";
+import {Plus, Search, Refresh, Edit, Delete, Setting, Check} from "@element-plus/icons-vue";
+import type {FormInstance, FormRules} from "element-plus";
 import {
   getRoles,
   createRole,
@@ -357,22 +374,22 @@ const formData = reactive<CreateRoleRequest & { id?: number }>({
 // 表单验证规则
 const formRules: FormRules = {
   roleName: [
-    { required: true, message: "请输入角色名称", trigger: "blur" },
-    { min: 2, max: 50, message: "角色名称长度在 2 到 50 个字符", trigger: "blur" }
+    {required: true, message: "请输入角色名称", trigger: "blur"},
+    {min: 2, max: 50, message: "角色名称长度在 2 到 50 个字符", trigger: "blur"}
   ],
   roleCode: [
-    { required: true, message: "请输入角色编码", trigger: "blur" },
-    { min: 2, max: 50, message: "角色编码长度在 2 到 50 个字符", trigger: "blur" },
-    { pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: "角色编码只能包含字母、数字和下划线，且以字母开头", trigger: "blur" }
+    {required: true, message: "请输入角色编码", trigger: "blur"},
+    {min: 2, max: 50, message: "角色编码长度在 2 到 50 个字符", trigger: "blur"},
+    {pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: "角色编码只能包含字母、数字和下划线，且以字母开头", trigger: "blur"}
   ],
   sort: [
-    { required: true, message: "请输入排序号", trigger: "blur" }
+    {required: true, message: "请输入排序号", trigger: "blur"}
   ],
   status: [
-    { required: true, message: "请选择状态", trigger: "change" }
+    {required: true, message: "请选择状态", trigger: "change"}
   ],
   dataScope: [
-    { required: true, message: "请选择数据权限范围", trigger: "change" }
+    {required: true, message: "请选择数据权限范围", trigger: "change"}
   ]
 };
 
@@ -514,10 +531,10 @@ const resetForm = () => {
 // 提交表单
 const handleSubmit = async () => {
   if (!formRef.value) return;
-  
+
   try {
     await formRef.value.validate();
-    
+
     // 检查角色编码是否已存在
     if (!isEdit.value || (isEdit.value && formData.roleCode)) {
       const checkResult = await checkRoleCodeExists(
@@ -529,9 +546,9 @@ const handleSubmit = async () => {
         return;
       }
     }
-    
+
     submitLoading.value = true;
-    
+
     if (isEdit.value) {
       // 更新角色
       const updateData: UpdateRoleRequest = {
@@ -602,12 +619,12 @@ const fetchMenuTree = async () => {
       menuType: 1,
       icon: "Setting",
       children: [
-        { id: 2, menuName: "用户管理", menuType: 2, icon: "User" },
-        { id: 3, menuName: "角色管理", menuType: 2, icon: "Avatar" },
-        { id: 4, menuName: "菜单管理", menuType: 2, icon: "Menu" },
-        { id: 5, menuName: "新增用户", menuType: 3, parentId: 2 },
-        { id: 6, menuName: "编辑用户", menuType: 3, parentId: 2 },
-        { id: 7, menuName: "删除用户", menuType: 3, parentId: 2 }
+        {id: 2, menuName: "用户管理", menuType: 2, icon: "User"},
+        {id: 3, menuName: "角色管理", menuType: 2, icon: "Avatar"},
+        {id: 4, menuName: "菜单管理", menuType: 2, icon: "Menu"},
+        {id: 5, menuName: "新增用户", menuType: 3, parentId: 2},
+        {id: 6, menuName: "编辑用户", menuType: 3, parentId: 2},
+        {id: 7, menuName: "删除用户", menuType: 3, parentId: 2}
       ]
     }
   ];
@@ -622,21 +639,21 @@ const fetchRolePermissions = async (roleId: number) => {
 // 保存角色权限分配
 const handleSaveRolePermissions = async () => {
   if (!currentRole.value || !menuTreeRef.value) return;
-  
+
   try {
     permissionAssignLoading.value = true;
-    
+
     // 获取选中的菜单ID
     const checkedKeys = menuTreeRef.value.getCheckedKeys();
     const halfCheckedKeys = menuTreeRef.value.getHalfCheckedKeys();
     const allSelectedKeys = [...checkedKeys, ...halfCheckedKeys];
-    
+
     // 这里需要调用保存角色权限的API
     console.log("保存角色权限:", {
       roleId: currentRole.value.id,
       menuIds: allSelectedKeys
     });
-    
+
     ElMessage.success("权限分配成功");
     permissionDialogVisible.value = false;
   } catch (error) {
