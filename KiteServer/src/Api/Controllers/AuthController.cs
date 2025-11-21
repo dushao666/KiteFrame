@@ -169,25 +169,35 @@ public class AuthController : ControllerBase
     /// <summary>
     /// 刷新Token
     /// </summary>
-    /// <param name="refreshToken">刷新令牌</param>
-    /// <returns>新的访问令牌</returns>
+    /// <param name="command">刷新令牌命令</param>
+    /// <returns>新的访问令牌和刷新令牌</returns>
     [HttpPost("refresh")]
     [AllowAnonymous]
-    [ProducesResponseType(typeof(ApiResult<string>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> RefreshTokenAsync([FromBody] string refreshToken)
+    [ProducesResponseType(typeof(ApiResult<RefreshTokenDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> RefreshTokenAsync([FromBody] RefreshTokenCommand command)
     {
         try
         {
-            // 这里应该实现刷新Token的逻辑
-            // 验证refreshToken的有效性
-            // 生成新的访问令牌
-            
-            return Ok(ApiResult<string>.Ok("new_access_token", "Token刷新成功"));
+            // 获取客户端IP地址和用户代理信息
+            command.ClientIp = GetClientIpAddress();
+            command.UserAgent = HttpContext.Request.Headers["User-Agent"].FirstOrDefault();
+
+            var result = await _mediator.Send(command);
+
+            _logger.LogInformation("Token刷新成功");
+
+            return Ok(ApiResult<RefreshTokenDto>.Ok(result, "Token刷新成功"));
+        }
+        catch (BusinessException ex)
+        {
+            _logger.LogWarning("刷新Token失败: {Message}", ex.Message);
+            return BadRequest(ApiResult.Fail(ex.Message));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "刷新Token过程中发生错误");
-            return StatusCode(500, ApiResult.Fail("Token刷新失败"));
+            return StatusCode(500, ApiResult.Fail("Token刷新失败，请稍后重试"));
         }
     }
 

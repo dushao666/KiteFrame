@@ -62,6 +62,9 @@ public static class ProgramExtensions
         // 添加 CORS
         builder.Services.AddCorsServices(builder.Configuration);
 
+        // 添加限流服务
+        builder.Services.AddRateLimitServices(builder.Configuration);
+
         return builder;
     }
 
@@ -105,6 +108,9 @@ public static class ProgramExtensions
         app.UseCorsMiddleware();
 
         app.UseHttpsRedirection();
+
+        // 使用限流中间件
+        app.UseRateLimiter();
 
         app.UseAuthentication();
         app.UseAuthorization();
