@@ -27,8 +27,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- 迁移脚本以嵌入资源随程序集发布，启动时由 DbUp 执行 -->
-    <EmbeddedResource Include="Sql\Migrations\*.sql" />
+    <!-- 迁移脚本以嵌入资源随程序集发布，启动时由 DbUp 执行；
+         按数据库方言分目录存放（Sql\Migrations\{MySql|PostgreSQL|...}\V00xx__描述.sql） -->
+    <EmbeddedResource Include="Sql\Migrations\**\*.sql" />
   </ItemGroup>
 
 </Project>
