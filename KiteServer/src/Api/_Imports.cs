@@ -7,6 +7,7 @@ global using System.Collections.Generic;
 global using System.Linq;
 global using System.Threading;
 global using System.Threading.Tasks;
+global using System.Threading.RateLimiting;
 global using System.ComponentModel;
 global using System.ComponentModel.DataAnnotations;
 global using System.Text;
@@ -18,6 +19,7 @@ global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.AspNetCore.Mvc.Controllers;
 global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
+global using Microsoft.AspNetCore.RateLimiting;
 
 // Swagger/OpenAPI
 global using Swashbuckle.AspNetCore.Annotations;
