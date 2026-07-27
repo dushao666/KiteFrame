@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <!-- SqlSugar 注解 -->
-    <PackageReference Include="SqlSugar" Version="5.1.4.157" />
+    <PackageReference Include="SqlSugarCoreNoDrive" Version="5.1.4.169" />
   </ItemGroup>
 
   <ItemGroup>

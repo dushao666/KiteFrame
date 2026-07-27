@@ -2,7 +2,7 @@
 
   <ItemGroup>
     <!-- SqlSugar ORM -->
-    <PackageReference Include="SqlSugar" Version="5.1.4.157" />
+    <PackageReference Include="SqlSugarCoreNoDrive" Version="5.1.4.169" />
 
     <!-- MySQL 驱动 -->
     <PackageReference Include="MySql.Data" Version="8.4.0" />
