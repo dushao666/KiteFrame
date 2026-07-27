@@ -110,7 +110,7 @@ public static class ProgramExtensions
         app.UseHttpsRedirection();
 
         // 使用限流中间件
-        app.UseRateLimiter();
+        app.UseRateLimitMiddleware();
 
         app.UseAuthentication();
         app.UseAuthorization();

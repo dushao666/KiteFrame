@@ -69,6 +69,22 @@ public static class RateLimitExtensions
     }
 
     /// <summary>
+    /// 使用限流中间件
+    /// </summary>
+    /// <param name="app">Web应用程序</param>
+    /// <returns></returns>
+    public static WebApplication UseRateLimitMiddleware(this WebApplication app)
+    {
+        var rateLimitSettings = app.Configuration.GetSection(RateLimitSettings.SectionName).Get<RateLimitSettings>();
+        if (rateLimitSettings?.Enabled == true)
+        {
+            app.UseRateLimiter();
+        }
+
+        return app;
+    }
+
+    /// <summary>
     /// 添加固定窗口限流策略
     /// </summary>
     private static void AddFixedWindowPolicy(RateLimiterOptions options, RateLimitSettings settings)
