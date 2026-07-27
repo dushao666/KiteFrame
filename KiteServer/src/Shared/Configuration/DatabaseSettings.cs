@@ -26,11 +26,6 @@ public class DatabaseSettings
     public bool EnableSqlLog { get; set; } = false;
 
     /// <summary>
-    /// 是否启用 CodeFirst（自动建表）
-    /// </summary>
-    public bool EnableCodeFirst { get; set; } = true;
-
-    /// <summary>
     /// 是否启用软删除
     /// </summary>
     public bool EnableSoftDelete { get; set; } = true;

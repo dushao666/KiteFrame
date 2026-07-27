@@ -11,6 +11,11 @@
     <PackageReference Include="MySql.Data" Version="8.4.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
+    <!-- 数据库迁移（Flyway 式 SQL 脚本，启动时自动执行） -->
+    <PackageReference Include="dbup-core" Version="6.1.1" />
+    <PackageReference Include="dbup-mysql" Version="6.1.0" />
+    <!-- 迁移执行器日志（与程序入口的静态 Log.* 保持一致） -->
+    <PackageReference Include="Serilog" Version="4.2.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,6 +24,11 @@
 
   <ItemGroup>
     <Folder Include="Sql\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 迁移脚本以嵌入资源随程序集发布，启动时由 DbUp 执行 -->
+    <EmbeddedResource Include="Sql\Migrations\*.sql" />
   </ItemGroup>
 
 </Project>

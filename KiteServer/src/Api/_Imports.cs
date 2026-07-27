@@ -47,6 +47,7 @@ global using Shared.Enums;
 global using Application.Commands.Auth;
 global using Application.DependencyInjection;
 global using Repository.Extensions;
+global using Repository.Migrations;
 global using Infrastructure.Extensions;
 global using Infrastructure.Exceptions;
 global using Api.Extensions;

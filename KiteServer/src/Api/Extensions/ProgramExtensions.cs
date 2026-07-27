@@ -75,6 +75,9 @@ public static class ProgramExtensions
     /// <returns></returns>
     public static WebApplication ConfigurePipeline(this WebApplication app)
     {
+        // 执行数据库迁移（DbUp：自动运行所有未执行的迁移脚本）
+        DatabaseMigrator.MigrateDatabase(app.Configuration);
+
         // 配置 HTTP 请求管道
         // 使用 Swagger 文档
         app.UseSwaggerMiddleware(app.Configuration);

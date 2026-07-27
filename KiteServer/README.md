@@ -8,6 +8,7 @@
 - **.NET 9** - 最新的 .NET 框架
 - **SqlSugar** - 高性能 ORM 框架
 - **MySQL** - 主数据库
+- **DbUp** - 数据库迁移（Flyway 式 SQL 脚本，启动时自动执行）
 - **Redis** - 缓存和会话存储
 - **Serilog** - 结构化日志
 - **JWT** - 身份认证
@@ -30,6 +31,7 @@ KiteServer/
 │   ├── Application/            # 应用服务层
 │   ├── Domain/                 # 领域层
 │   ├── Infrastructure/         # 基础设施层
+│   ├── Repository/             # 仓储层（DBContext、迁移执行器、Sql/Migrations 迁移脚本）
 │   └── Shared/                 # 共享层
 ├── tests/                      # 测试项目
 │   ├── UnitTests/              # 单元测试
@@ -61,8 +63,8 @@ KiteServer/
    ```
 
 3. **配置数据库**
-   - 创建 MySQL 数据库
-   - 修改 `appsettings.Development.json` 中的连接字符串
+   - 修改 `appsettings.Development.json` 中的连接字符串（`ConnectionStrings:DefaultConnection`）
+   - 无需手动建表：首次启动时 DbUp 自动创建表结构与基础数据，并在版本表 `sys_schema_versions` 中记录已执行的迁移脚本
 
 4. **运行项目**
    ```bash
@@ -125,6 +127,11 @@ KiteServer/
   }
 }
 ```
+
+#### 数据库迁移（DbUp）
+
+- 迁移脚本位于 `src/Repository/Sql/Migrations/`（Flyway 风格命名 `V00xx__描述.sql`），嵌入 Repository 程序集，应用启动时自动执行尚未执行的脚本。
+- 表结构变更请新增下一个编号的迁移脚本，不要修改已执行的脚本；完整约定见 `docs/项目开发规范.md` 第 10 章。
 
 ## 📝 日志功能
 

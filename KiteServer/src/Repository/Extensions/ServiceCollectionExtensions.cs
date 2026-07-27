@@ -16,35 +16,15 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static void AddCustomDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        // 获取数据库配置
-        var section = configuration.GetSection(DatabaseSettings.SectionName);
-        var databaseTypeValue = section["DatabaseType"];
-        var databaseType = string.IsNullOrEmpty(databaseTypeValue) 
-            ? DatabaseType.MySQL 
-            : Enum.Parse<DatabaseType>(databaseTypeValue);
-        var enableSqlLog = bool.Parse(section["EnableSqlLog"] ?? "false");
-        
-        // 根据配置的数据库类型转换为SqlSugar的DbType和连接字符串键名
-        var (dbType, connectionStringKey) = databaseType switch
-        {
-            DatabaseType.MySQL => (DbType.MySql, "MySQL"),
-            DatabaseType.PostgreSQL => (DbType.PostgreSQL, "PostgreSQL"),
-            DatabaseType.SQLServer => (DbType.SqlServer, "SQLServer"),
-            DatabaseType.SQLite => (DbType.Sqlite, "SQLite"),
-            DatabaseType.Oracle => (DbType.Oracle, "Oracle"),
-            _ => (DbType.MySql, "MySQL") // 默认使用MySQL
-        };
-
-        // 获取对应数据库类型的连接字符串
-        var connectionString = configuration.GetConnectionString(connectionStringKey) 
-                              ?? configuration.GetConnectionString("DefaultConnection") 
-                              ?? throw new InvalidOperationException($"未找到数据库类型 {databaseType} 对应的连接字符串配置");
+        // 解析数据库类型与连接字符串（与数据库迁移共用同一解析逻辑）
+        var connection = DatabaseConnectionFactory.Resolve(configuration);
+        var enableSqlLog = bool.Parse(configuration.GetSection(DatabaseSettings.SectionName)["EnableSqlLog"] ?? "false");
 
         // SnowFlakeSingle.WorkId = 1;
         SqlSugarScope sqlSugar = new SqlSugarScope(new ConnectionConfig()
         {
-            DbType = dbType,
-            ConnectionString = connectionString,
+            DbType = connection.DbType,
+            ConnectionString = connection.ConnectionString,
             IsAutoCloseConnection = true,
             InitKeyType = InitKeyType.Attribute
         },
