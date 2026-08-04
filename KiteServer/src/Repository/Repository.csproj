@@ -28,8 +28,11 @@
 
   <ItemGroup>
     <!-- 迁移脚本以嵌入资源随程序集发布，启动时由 DbUp 执行；
-         按数据库方言分目录存放（Sql\Migrations\{MySql|PostgreSQL|...}\V00xx__描述.sql） -->
-    <EmbeddedResource Include="Sql\Migrations\**\*.sql" />
+         按 方言/年/月 分目录存放（Sql\Migrations\{MySql|PostgreSQL|...}\{年}\{月}\V00xx__描述.sql）；
+         LogicalName 保证资源名与目录结构一一对应（编译器会给数字开头的目录段自动加下划线前缀） -->
+    <EmbeddedResource Include="Sql\Migrations\**\*.sql">
+      <LogicalName>Repository.Sql.Migrations.$([System.String]::Copy('%(RecursiveDir)').Replace('\', '.').Replace('/', '.'))%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

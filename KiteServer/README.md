@@ -31,7 +31,7 @@ KiteServer/
 │   ├── Application/            # 应用服务层
 │   ├── Domain/                 # 领域层
 │   ├── Infrastructure/         # 基础设施层
-│   ├── Repository/             # 仓储层（DBContext、迁移执行器、Sql/Migrations 迁移脚本，按数据库方言分子目录）
+│   ├── Repository/             # 仓储层（DBContext、迁移执行器、Sql/Migrations 迁移脚本，按方言/年/月分子目录）
 │   └── Shared/                 # 共享层
 ├── tests/                      # 测试项目
 │   ├── UnitTests/              # 单元测试
@@ -130,7 +130,7 @@ KiteServer/
 
 #### 数据库迁移（DbUp）
 
-- 迁移脚本位于 `src/Repository/Sql/Migrations/{方言}/`（Flyway 风格命名 `V00xx__描述.sql`，按数据库方言分子目录存放，当前仅维护 `MySql/`），嵌入 Repository 程序集，应用启动时自动执行当前数据库方言目录下尚未执行的脚本。
+- 迁移脚本位于 `src/Repository/Sql/Migrations/{方言}/{年}/{月}/`（Flyway 风格命名 `V00xx__描述.sql`，按 方言 → 年 → 月 层级子目录存放，当前仅维护 `MySql/` 方言），嵌入 Repository 程序集，应用启动时自动执行当前数据库方言目录下尚未执行的脚本。
 - 表结构变更请新增下一个编号的迁移脚本，不要修改已执行的脚本；完整约定见 `docs/项目开发规范.md` 第 10 章。
 
 ## 📝 日志功能
