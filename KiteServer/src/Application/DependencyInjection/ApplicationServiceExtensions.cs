@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using Application.Behaviors;
+using Application.DependencyInjection.Mapping;
 using FluentValidation;
 
 namespace Application.DependencyInjection;
@@ -78,9 +79,13 @@ public static class ApplicationServiceExtensions
     /// </summary>
     /// <param name="services">服务集合</param>
     /// <returns></returns>
+    /// <remarks>
+    /// 通过程序集扫描加载所有 <see cref="Mapster.IRegister"/> 实现（位于 DependencyInjection/Mapping/，按模块拆分），
+    /// 新增模块映射只需新增一个实现类，无需修改本入口。
+    /// </remarks>
     public static IServiceCollection AddMapsterConfiguration(this IServiceCollection services)
     {
-        // 扫描并注册 Mapster 配置
+        // 扫描并注册程序集内所有 Mapster 配置（IRegister 实现）
         Mapster.TypeAdapterConfig.GlobalSettings.Scan(typeof(MapsterConfiguration).Assembly);
 
         return services;
