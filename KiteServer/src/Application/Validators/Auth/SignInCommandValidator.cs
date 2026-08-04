@@ -9,6 +9,10 @@ namespace Application.Validators.Auth;
 /// </summary>
 public class SignInCommandValidator : AbstractValidator<SignInCommand>
 {
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+
     public SignInCommandValidator()
     {
         RuleFor(x => x.Type)

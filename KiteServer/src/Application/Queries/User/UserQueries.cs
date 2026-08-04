@@ -11,6 +11,10 @@ public class UserQueries : IUserQueries
     private readonly ISugarUnitOfWork<DBContext> _unitOfWork;
     private readonly ILogger<UserQueries> _logger;
 
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+
     public UserQueries(ISugarUnitOfWork<DBContext> unitOfWork, ILogger<UserQueries> logger)
     {
         _unitOfWork = unitOfWork;

@@ -10,6 +10,10 @@ public class MenuQueries : IMenuQueries
     private readonly ISugarUnitOfWork<DBContext> _unitOfWork;
     private readonly ILogger<MenuQueries> _logger;
 
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+
     public MenuQueries(ISugarUnitOfWork<DBContext> unitOfWork, ILogger<MenuQueries> logger)
     {
         _unitOfWork = unitOfWork;

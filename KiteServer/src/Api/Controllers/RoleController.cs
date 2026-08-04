@@ -31,6 +31,7 @@ public class RoleController : ControllerBase
     /// <param name="request">查询请求</param>
     /// <returns>角色列表</returns>
     [HttpGet]
+    [Authorize(Policy = Permissions.SystemRoleList)]
     [ProducesResponseType(typeof(ApiResult<PagedResult<RoleDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetRoles([FromQuery] GetRolesRequest request)
@@ -45,6 +46,7 @@ public class RoleController : ControllerBase
     /// <param name="id">角色ID</param>
     /// <returns>角色详情</returns>
     [HttpGet("{id}")]
+    [Authorize(Policy = Permissions.SystemRoleList)]
     [ProducesResponseType(typeof(ApiResult<RoleDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
@@ -59,6 +61,7 @@ public class RoleController : ControllerBase
     /// </summary>
     /// <returns>角色列表</returns>
     [HttpGet("enabled")]
+    [Authorize(Policy = Permissions.SystemRoleList)]
     [ProducesResponseType(typeof(ApiResult<List<RoleDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetEnabledRoles()
@@ -74,6 +77,7 @@ public class RoleController : ControllerBase
     /// <param name="excludeId">排除的角色ID</param>
     /// <returns>是否存在</returns>
     [HttpGet("check-code")]
+    [Authorize(Policy = Permissions.SystemRoleList)]
     [ProducesResponseType(typeof(ApiResult<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> CheckRoleCodeExists([FromQuery] string roleCode, [FromQuery] long? excludeId = null)
@@ -88,6 +92,7 @@ public class RoleController : ControllerBase
     /// <param name="request">创建请求</param>
     /// <returns>角色ID</returns>
     [HttpPost]
+    [Authorize(Policy = Permissions.SystemRoleAdd)]
     [ProducesResponseType(typeof(ApiResult<long>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
@@ -114,6 +119,7 @@ public class RoleController : ControllerBase
     /// <param name="request">更新请求</param>
     /// <returns>是否成功</returns>
     [HttpPut("{id}")]
+    [Authorize(Policy = Permissions.SystemRoleEdit)]
     [ProducesResponseType(typeof(ApiResult<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status404NotFound)]
@@ -141,6 +147,7 @@ public class RoleController : ControllerBase
     /// <param name="id">角色ID</param>
     /// <returns>是否成功</returns>
     [HttpDelete("{id}")]
+    [Authorize(Policy = Permissions.SystemRoleDelete)]
     [ProducesResponseType(typeof(ApiResult<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
@@ -158,6 +165,7 @@ public class RoleController : ControllerBase
     /// <param name="request">权限分配请求</param>
     /// <returns>分配结果</returns>
     [HttpPost("{roleId}/permissions")]
+    [Authorize(Policy = Permissions.SystemRolePermission)]
     [ProducesResponseType(typeof(ApiResult<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]

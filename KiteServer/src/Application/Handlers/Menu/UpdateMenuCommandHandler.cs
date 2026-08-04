@@ -10,11 +10,22 @@ public class UpdateMenuCommandHandler : IRequestHandler<UpdateMenuCommand, ApiRe
     private readonly ISugarUnitOfWork<DBContext> _unitOfWork;
     private readonly ILogger<UpdateMenuCommandHandler> _logger;
 
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+
     public UpdateMenuCommandHandler(ISugarUnitOfWork<DBContext> unitOfWork, ILogger<UpdateMenuCommandHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _logger = logger;
     }
+
+    /// <summary>
+    /// 处理命令
+    /// </summary>
+    /// <param name="request">命令</param>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <returns>处理结果</returns>
 
     public async Task<ApiResult<bool>> Handle(UpdateMenuCommand request, CancellationToken cancellationToken)
     {

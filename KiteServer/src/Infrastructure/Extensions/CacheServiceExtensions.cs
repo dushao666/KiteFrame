@@ -1,3 +1,5 @@
+using Serilog;
+
 namespace Infrastructure.Extensions;
 
 /// <summary>
@@ -13,10 +15,7 @@ public static class CacheServiceExtensions
     /// <returns></returns>
     public static IServiceCollection AddCacheServices(this IServiceCollection services, IConfiguration configuration)
     {
-        // 注册配置
-        services.Configure<CacheSettings>(configuration.GetSection(CacheSettings.SectionName));
-        services.Configure<RedisSettings>(configuration.GetSection(RedisSettings.SectionName));
-
+        // 配置绑定统一在组合根的 AddConfigurationOptions 中完成，此处只读取不重复绑定
         var cacheSettings = configuration.GetSection(CacheSettings.SectionName).Get<CacheSettings>() ?? new CacheSettings();
         var redisSettings = configuration.GetSection(RedisSettings.SectionName).Get<RedisSettings>() ?? new RedisSettings();
 
@@ -76,12 +75,13 @@ public static class CacheServiceExtensions
                             logger.LogError("Redis错误消息: {EndPoint} - {Message}", e.EndPoint, e.Message);
                         };
 
-                        logger.LogInformation("Redis连接成功建立: {ConnectionString}", redisConnectionString);
+                        // 不记录连接字符串（可能包含密码等敏感信息）
+                        logger.LogInformation("Redis连接成功建立");
                         return multiplexer;
                     }
                     catch (Exception ex)
                     {
-                        logger.LogError(ex, "Redis连接失败: {ConnectionString}", redisConnectionString);
+                        logger.LogError(ex, "Redis连接失败");
                         throw;
                     }
                 });
@@ -97,10 +97,9 @@ public static class CacheServiceExtensions
             }
             catch (Exception ex)
             {
-                var serviceProvider = services.BuildServiceProvider();
-                var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
-                var logger = loggerFactory?.CreateLogger("CacheServiceExtensions");
-                logger?.LogError(ex, "Redis缓存配置失败，将禁用Redis缓存");
+                // 注册阶段不得调用 BuildServiceProvider（会创建与最终容器隔离的第二个容器），
+                // 此处使用 Serilog 静态日志（与程序入口一致）
+                Log.Error(ex, "Redis缓存配置失败，将禁用Redis缓存");
             }
         }
 

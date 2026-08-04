@@ -26,6 +26,7 @@ global using Mapster;
 global using Shared.Models;
 global using Shared.Models.Dtos;
 global using Shared.Enums;
+global using Shared.Events;
 global using Domain.Entities;
 global using Repository;
 global using SqlSugar;

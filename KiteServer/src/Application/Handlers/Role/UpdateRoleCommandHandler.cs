@@ -12,6 +12,10 @@ public class UpdateRoleCommandHandler : IRequestHandler<UpdateRoleCommand, ApiRe
     private readonly ILogger<UpdateRoleCommandHandler> _logger;
     private readonly IRoleQueries _roleQueries;
 
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+
     public UpdateRoleCommandHandler(
         ISugarUnitOfWork<DBContext> unitOfWork, 
         ILogger<UpdateRoleCommandHandler> logger,
@@ -21,6 +25,13 @@ public class UpdateRoleCommandHandler : IRequestHandler<UpdateRoleCommand, ApiRe
         _logger = logger;
         _roleQueries = roleQueries;
     }
+
+    /// <summary>
+    /// 处理命令
+    /// </summary>
+    /// <param name="request">命令</param>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <returns>处理结果</returns>
 
     public async Task<ApiResult<bool>> Handle(UpdateRoleCommand request, CancellationToken cancellationToken)
     {

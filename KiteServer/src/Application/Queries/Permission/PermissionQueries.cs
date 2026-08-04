@@ -76,7 +76,7 @@ public class PermissionQueries : IPermissionQueries
             // 获取权限列表
             var permissions = roleMenus
                 .Where(m => !string.IsNullOrEmpty(m.Permissions))
-                .SelectMany(m => m.Permissions.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                .SelectMany(m => m.Permissions!.Split(',', StringSplitOptions.RemoveEmptyEntries))
                 .Distinct()
                 .ToList();
 

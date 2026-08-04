@@ -10,6 +10,10 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, R
     private readonly ILogger<RefreshTokenCommandHandler> _logger;
     private readonly Infrastructure.Services.ICacheService _cacheService;
 
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+
     public RefreshTokenCommandHandler(
         ISugarUnitOfWork<DBContext> unitOfWork,
         IConfiguration configuration,
@@ -21,6 +25,13 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, R
         _logger = logger;
         _cacheService = cacheService;
     }
+
+    /// <summary>
+    /// 处理命令
+    /// </summary>
+    /// <param name="request">命令</param>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <returns>处理结果</returns>
 
     public async Task<RefreshTokenDto> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {

@@ -12,6 +12,12 @@ public class AuthController : ControllerBase
     private readonly IPermissionQueries _permissionQueries;
     private readonly ILogger<AuthController> _logger;
 
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    /// <param name="mediator">MediatR</param>
+    /// <param name="permissionQueries">权限查询服务</param>
+    /// <param name="logger">日志</param>
     public AuthController(IMediator mediator, IPermissionQueries permissionQueries, ILogger<AuthController> logger)
     {
         _mediator = mediator;
@@ -30,33 +36,15 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> SignInAsync([FromBody] SignInCommand command)
     {
-        try
-        {
-            // 获取客户端IP地址和用户代理信息
-            command.ClientIp = GetClientIpAddress();
-            command.UserAgent = HttpContext.Request.Headers["User-Agent"].FirstOrDefault();
+        // 获取客户端IP地址和用户代理信息
+        command.ClientIp = GetClientIpAddress();
+        command.UserAgent = HttpContext.Request.Headers.UserAgent.FirstOrDefault();
 
-            var result = await _mediator.Send(command);
+        var result = await _mediator.Send(command);
 
-            _logger.LogInformation("用户 {UserName} 登录成功", result.UserName);
+        _logger.LogInformation("用户 {UserName} 登录成功", result.UserName);
 
-            return Ok(ApiResult<LoginUserDto>.Ok(result, "登录成功"));
-        }
-        catch (BusinessException ex)
-        {
-            _logger.LogWarning("登录失败: {Message}", ex.Message);
-            return BadRequest(ApiResult.Fail(ex.Message));
-        }
-        catch (Infrastructure.Exceptions.ValidationException ex)
-        {
-            _logger.LogWarning("登录参数验证失败: {Message}", ex.Message);
-            return BadRequest(ApiResult.Fail(ex.Message));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "登录过程中发生未知错误");
-            return StatusCode(500, ApiResult.Fail("登录失败，请稍后重试"));
-        }
+        return Ok(ApiResult<LoginUserDto>.Ok(result, "登录成功"));
     }
 
     /// <summary>
@@ -68,43 +56,35 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status200OK)]
     public async Task<IActionResult> SignOutAsync()
     {
-        try
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var userName = User.FindFirst(ClaimTypes.Name)?.Value;
+
+        if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(userName))
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var userName = User.FindFirst(ClaimTypes.Name)?.Value;
-            
-            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(userName))
-            {
-                return Unauthorized(ApiResult.Fail("用户未登录"));
-            }
-
-            // 从请求头获取RefreshToken作为SessionId
-            var refreshToken = HttpContext.Request.Headers["Authorization"]
-                .FirstOrDefault()?.Replace("Bearer ", "");
-
-            var command = new SignOutCommand
-            {
-                UserId = long.Parse(userId),
-                UserName = userName,
-                SessionId = refreshToken ?? string.Empty,
-                ClientIp = GetClientIpAddress(),
-                LogoutType = 1 // 主动退出
-            };
-
-            var result = await _mediator.Send(command);
-            
-            if (result)
-            {
-                return Ok(ApiResult.Ok("登出成功"));
-            }
-            else
-            {
-                return StatusCode(500, ApiResult.Fail("登出失败"));
-            }
+            return Unauthorized(ApiResult.Fail("用户未登录"));
         }
-        catch (Exception ex)
+
+        // 从请求头获取RefreshToken作为SessionId
+        var refreshToken = HttpContext.Request.Headers.Authorization
+            .FirstOrDefault()?.Replace("Bearer ", "");
+
+        var command = new SignOutCommand
         {
-            _logger.LogError(ex, "登出过程中发生错误");
+            UserId = long.Parse(userId),
+            UserName = userName,
+            SessionId = refreshToken ?? string.Empty,
+            ClientIp = GetClientIpAddress(),
+            LogoutType = 1 // 主动退出
+        };
+
+        var result = await _mediator.Send(command);
+
+        if (result)
+        {
+            return Ok(ApiResult.Ok("登出成功"));
+        }
+        else
+        {
             return StatusCode(500, ApiResult.Fail("登出失败"));
         }
     }
@@ -116,27 +96,19 @@ public class AuthController : ControllerBase
     [HttpGet("profile")]
     [Authorize]
     [ProducesResponseType(typeof(ApiResult<LoginUserDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetProfileAsync()
+    public IActionResult GetProfileAsync()
     {
-        try
+        var userInfo = new LoginUserDto
         {
-            var userInfo = new LoginUserDto
-            {
-                UserId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0"),
-                UserName = User.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty,
-                Email = User.FindFirst(ClaimTypes.Email)?.Value,
-                RealName = User.FindFirst("RealName")?.Value,
-                Phone = User.FindFirst(ClaimTypes.MobilePhone)?.Value,
-                Avatar = User.FindFirst("Avatar")?.Value
-            };
+            UserId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0"),
+            UserName = User.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty,
+            Email = User.FindFirst(ClaimTypes.Email)?.Value,
+            RealName = User.FindFirst("RealName")?.Value,
+            Phone = User.FindFirst(ClaimTypes.MobilePhone)?.Value,
+            Avatar = User.FindFirst("Avatar")?.Value
+        };
 
-            return Ok(ApiResult<LoginUserDto>.Ok(userInfo, "获取用户信息成功"));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "获取用户信息过程中发生错误");
-            return StatusCode(500, ApiResult.Fail("获取用户信息失败"));
-        }
+        return Ok(ApiResult<LoginUserDto>.Ok(userInfo, "获取用户信息成功"));
     }
 
     /// <summary>
@@ -148,22 +120,14 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(ApiResult<List<MenuDto>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetUserRoutesAsync()
     {
-        try
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized(ApiResult.Fail("用户未登录"));
-            }
+            return Unauthorized(ApiResult.Fail("用户未登录"));
+        }
 
-            var result = await _permissionQueries.GetUserMenuTreeAsync(long.Parse(userId));
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "获取用户路由过程中发生错误");
-            return StatusCode(500, ApiResult.Fail("获取用户路由失败"));
-        }
+        var result = await _permissionQueries.GetUserMenuTreeAsync(long.Parse(userId));
+        return Ok(result);
     }
 
     /// <summary>
@@ -177,28 +141,15 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> RefreshTokenAsync([FromBody] RefreshTokenCommand command)
     {
-        try
-        {
-            // 获取客户端IP地址和用户代理信息
-            command.ClientIp = GetClientIpAddress();
-            command.UserAgent = HttpContext.Request.Headers["User-Agent"].FirstOrDefault();
+        // 获取客户端IP地址和用户代理信息
+        command.ClientIp = GetClientIpAddress();
+        command.UserAgent = HttpContext.Request.Headers.UserAgent.FirstOrDefault();
 
-            var result = await _mediator.Send(command);
+        var result = await _mediator.Send(command);
 
-            _logger.LogInformation("Token刷新成功");
+        _logger.LogInformation("Token刷新成功");
 
-            return Ok(ApiResult<RefreshTokenDto>.Ok(result, "Token刷新成功"));
-        }
-        catch (BusinessException ex)
-        {
-            _logger.LogWarning("刷新Token失败: {Message}", ex.Message);
-            return BadRequest(ApiResult.Fail(ex.Message));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "刷新Token过程中发生错误");
-            return StatusCode(500, ApiResult.Fail("Token刷新失败，请稍后重试"));
-        }
+        return Ok(ApiResult<RefreshTokenDto>.Ok(result, "Token刷新成功"));
     }
 
     /// <summary>
@@ -209,77 +160,33 @@ public class AuthController : ControllerBase
     [HttpPost("change-password")]
     [Authorize]
     [ProducesResponseType(typeof(ApiResult<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ChangePasswordAsync([FromBody] ChangePasswordRequest request)
     {
-        try
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized(ApiResult.Fail("用户未登录"));
-            }
+            return Unauthorized(ApiResult.Fail("用户未登录"));
+        }
 
-            // 这里应该调用相应的命令处理器来修改密码
-            // var command = new ChangePasswordCommand
-            // {
-            //     UserId = long.Parse(userId),
-            //     OldPassword = request.OldPassword,
-            //     NewPassword = request.NewPassword
-            // };
-            // var result = await _mediator.Send(command);
-            
-            return Ok(ApiResult<bool>.Ok(true, "密码修改成功"));
-        }
-        catch (Exception ex)
+        var command = new ChangePasswordCommand
         {
-            _logger.LogError(ex, "修改密码过程中发生错误");
-            return StatusCode(500, ApiResult.Fail("密码修改失败"));
-        }
+            UserId = long.Parse(userId),
+            OldPassword = request.OldPassword,
+            NewPassword = request.NewPassword
+        };
+
+        var result = await _mediator.Send(command);
+        return Ok(result);
     }
 
     /// <summary>
     /// 获取客户端IP地址
+    /// 启用 UseForwardedHeaders 后，RemoteIpAddress 已由框架按转发头解析，无需手工读取原始请求头（避免伪造）
     /// </summary>
     /// <returns>IP地址</returns>
     private string GetClientIpAddress()
     {
-        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
-        
-        // 检查是否通过代理
-        var forwardedHeader = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
-        if (!string.IsNullOrEmpty(forwardedHeader))
-        {
-            ipAddress = forwardedHeader.Split(',')[0].Trim();
-        }
-        
-        // 检查是否通过负载均衡器
-        var realIpHeader = HttpContext.Request.Headers["X-Real-IP"].FirstOrDefault();
-        if (!string.IsNullOrEmpty(realIpHeader))
-        {
-            ipAddress = realIpHeader;
-        }
-
-        return ipAddress ?? "unknown";
+        return HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
     }
-}
-
-/// <summary>
-/// 修改密码请求
-/// </summary>
-public class ChangePasswordRequest
-{
-    /// <summary>
-    /// 旧密码
-    /// </summary>
-    public string OldPassword { get; set; } = string.Empty;
-
-    /// <summary>
-    /// 新密码
-    /// </summary>
-    public string NewPassword { get; set; } = string.Empty;
-
-    /// <summary>
-    /// 确认新密码
-    /// </summary>
-    public string ConfirmPassword { get; set; } = string.Empty;
 }

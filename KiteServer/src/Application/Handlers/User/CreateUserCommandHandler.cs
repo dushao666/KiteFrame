@@ -10,11 +10,22 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, ApiRe
     private readonly ISugarUnitOfWork<DBContext> _unitOfWork;
     private readonly ILogger<CreateUserCommandHandler> _logger;
 
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+
     public CreateUserCommandHandler(ISugarUnitOfWork<DBContext> unitOfWork, ILogger<CreateUserCommandHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _logger = logger;
     }
+
+    /// <summary>
+    /// 处理命令
+    /// </summary>
+    /// <param name="request">命令</param>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <returns>处理结果</returns>
 
     public async Task<ApiResult<long>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
@@ -92,8 +103,8 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, ApiRe
                 if (string.IsNullOrWhiteSpace(user.Phone))
                     user.Phone = null;
 
-                // 加密密码 - 使用SHA512保持与登录一致
-                user.Password = EncryptionHelper.Sha512(request.Password);
+                // 加密密码 - 使用带盐 PBKDF2，与登录验证保持一致
+                user.Password = PasswordHasher.HashPassword(request.Password);
 
                 var result = await context.Users.InsertReturnEntityAsync(user);
                 context.Commit();

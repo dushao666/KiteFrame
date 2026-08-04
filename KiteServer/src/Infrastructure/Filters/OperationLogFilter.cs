@@ -232,29 +232,11 @@ public class OperationLogFilter : IAsyncActionFilter
 
     /// <summary>
     /// 获取客户端IP地址
+    /// 宿主已启用 UseForwardedHeaders，RemoteIpAddress 由框架按可信代理规则解析转发头得到；
+    /// 此处不手工读取 X-Forwarded-For / X-Real-IP 等原始请求头，避免客户端伪造 IP 污染审计日志
     /// </summary>
     private string? GetClientIpAddress(HttpRequest request)
     {
-        // 尝试从各种可能的头部获取真实IP
-        var ipAddress = request.Headers["X-Forwarded-For"].FirstOrDefault();
-        if (!string.IsNullOrEmpty(ipAddress))
-        {
-            // X-Forwarded-For 可能包含多个IP，取第一个
-            return ipAddress.Split(',')[0].Trim();
-        }
-
-        ipAddress = request.Headers["X-Real-IP"].FirstOrDefault();
-        if (!string.IsNullOrEmpty(ipAddress))
-        {
-            return ipAddress;
-        }
-
-        ipAddress = request.Headers["CF-Connecting-IP"].FirstOrDefault();
-        if (!string.IsNullOrEmpty(ipAddress))
-        {
-            return ipAddress;
-        }
-
         return request.HttpContext.Connection.RemoteIpAddress?.ToString();
     }
 }

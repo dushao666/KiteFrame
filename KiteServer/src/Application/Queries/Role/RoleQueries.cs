@@ -10,6 +10,10 @@ public class RoleQueries : IRoleQueries
     private readonly ISugarUnitOfWork<DBContext> _unitOfWork;
     private readonly ILogger<RoleQueries> _logger;
 
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+
     public RoleQueries(ISugarUnitOfWork<DBContext> unitOfWork, ILogger<RoleQueries> logger)
     {
         _unitOfWork = unitOfWork;

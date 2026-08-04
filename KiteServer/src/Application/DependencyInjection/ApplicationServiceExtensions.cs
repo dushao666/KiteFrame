@@ -1,9 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
-using Application.Queries.User;
-using Application.Queries.Role;
-using Application.Queries.Permission;
-using Application.Queries.Monitor;
+using Application.Behaviors;
+using FluentValidation;
 
 namespace Application.DependencyInjection;
 
@@ -22,8 +20,16 @@ public static class ApplicationServiceExtensions
         // 添加查询服务
         services.AddQueryServices();
 
-        // 添加命令处理器（MediatR会自动扫描）
-        // 这里不需要手动注册，MediatR会自动发现和注册
+        // 注册 MediatR：命令处理器与事件处理器由 MediatR 自动发现，
+        // 并挂载校验管道行为（校验失败抛出 ValidationException，由全局异常处理器统一转换）
+        services.AddMediatR(cfg =>
+        {
+            cfg.RegisterServicesFromAssembly(typeof(ApplicationServiceExtensions).Assembly);
+            cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
+        });
+
+        // 注册 FluentValidation 校验器（按程序集扫描）
+        services.AddValidatorsFromAssembly(typeof(ApplicationServiceExtensions).Assembly);
 
         return services;
     }

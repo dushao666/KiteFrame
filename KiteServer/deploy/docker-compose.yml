@@ -1,5 +1,4 @@
-version: '3.8'
-
+# 敏感凭据通过同目录 .env 文件注入（模板见 .env.example），.env 已被 .gitignore 排除，禁止提交到仓库
 services:
   # KiteServer API 服务
   kiteserver-api:
@@ -8,19 +7,20 @@ services:
       dockerfile: deploy/Dockerfile
     container_name: kiteserver-api
     ports:
+      # 容器内只暴露 http 端口；TLS 由外部反向代理终结（容器内无证书，不启用 https 端点）
       - "8080:8080"
-      - "8081:8081"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=http://+:8080;https://+:8081
-      - ConnectionStrings__DefaultConnection=Server=mysql;Database=KiteServerDB;Uid=root;Pwd=123456;
-      - Redis__Host=redis
-      - Redis__Port=6379
-      - Redis__Password=
-      - Redis__Database=0
+      - ASPNETCORE_URLS=http://+:8080
+      # 敏感配置经标准环境变量注入（.NET 配置系统双下划线层级分隔，详见 appsettings.Production.json 头部说明）
+      - ConnectionStrings__MySQL=Server=mysql;Port=3306;Database=kiteserver;Uid=kiteserver;Pwd=${MYSQL_PASSWORD};CharSet=utf8mb4;
+      - JwtSettings__SecretKey=${JWT_SECRET_KEY}
+      - ConnectionStrings__Redis=redis:6379,password=${REDIS_PASSWORD}
     depends_on:
-      - mysql
-      - redis
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
     networks:
       - kiteserver-network
     restart: unless-stopped
@@ -32,49 +32,54 @@ services:
   mysql:
     image: mysql:8.0
     container_name: kiteserver-mysql
-    ports:
-      - "3306:3306"
+    # 不向宿主机映射 3306 端口，仅容器网络内可访问；如需本地调试连接再临时添加 ports
     environment:
-      MYSQL_ROOT_PASSWORD: 123456
-      MYSQL_DATABASE: KiteServerDB
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: kiteserver
       MYSQL_USER: kiteserver
-      MYSQL_PASSWORD: kiteserver123
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - mysql-data:/var/lib/mysql
-      - ./mysql/init:/docker-entrypoint-initdb.d
     networks:
       - kiteserver-network
     restart: unless-stopped
-    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      # $$ 转义：在容器内部展开其自身的环境变量
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 
   # Redis 缓存
   redis:
     image: redis:7-alpine
     container_name: kiteserver-redis
-    ports:
-      - "6379:6379"
+    # 不向宿主机映射 6379 端口，仅容器网络内可访问
     volumes:
       - redis-data:/data
     networks:
       - kiteserver-network
     restart: unless-stopped
-    command: redis-server --appendonly yes
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
 
-  # Nginx 反向代理
-  nginx:
-    image: nginx:alpine
-    container_name: kiteserver-nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./nginx/ssl:/etc/nginx/ssl
-    depends_on:
-      - kiteserver-api
-    networks:
-      - kiteserver-network
-    restart: unless-stopped
+  # Nginx 反向代理（暂未启用）：
+  # 启用前需先在 deploy/nginx/ 下准备好 nginx.conf 与证书，再取消注释
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: kiteserver-nginx
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+  #     - ./nginx/ssl:/etc/nginx/ssl
+  #   depends_on:
+  #     - kiteserver-api
+  #   networks:
+  #     - kiteserver-network
+  #   restart: unless-stopped
 
 volumes:
   mysql-data:

@@ -20,9 +20,6 @@ global using Microsoft.Extensions.Options;
 // ASP.NET Core
 global using Microsoft.AspNetCore.Http;
 
-// SqlSugar ORM
-global using SqlSugar;
-
 // 缓存
 global using Microsoft.Extensions.Caching.Memory;
 

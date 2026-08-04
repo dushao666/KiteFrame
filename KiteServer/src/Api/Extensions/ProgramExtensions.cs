@@ -1,3 +1,7 @@
+using Api.Authorization;
+using Microsoft.AspNetCore.HttpOverrides;
+using Shared.Constants;
+
 namespace Api.Extensions;
 
 /// <summary>
@@ -40,11 +44,21 @@ public static class ProgramExtensions
         // 添加缓存服务
         builder.Services.AddCacheServices(builder.Configuration);
 
-        // 添加应用层服务（包括查询服务、Mapster配置等）
+        // 添加基础设施层服务（HTTP 上下文访问器、当前用户服务等）
+        builder.Services.AddInfrastructureServices();
+
+        // 添加应用层服务（包括查询服务、MediatR、校验器、Mapster配置等）
         builder.Services.AddApplicationServices();
 
-        // 添加 MediatR
-        builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Application.Commands.User.CreateUserCommand).Assembly));
+        // 配置转发头解析（配合 UseForwardedHeaders 使用）
+        builder.Services.Configure<ForwardedHeadersOptions>(options =>
+        {
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            // 容器 / 反向代理部署时代理地址通常为动态分配，此处清空默认的环回限制以接受转发头；
+            // 若部署拓扑固定，建议改为精确配置 KnownProxies / KnownNetworks
+            options.KnownNetworks.Clear();
+            options.KnownProxies.Clear();
+        });
 
         // 添加 JWT 认证
         builder.Services.AddJwtAuthentication(builder.Configuration);
@@ -65,6 +79,9 @@ public static class ProgramExtensions
         // 添加限流服务
         builder.Services.AddRateLimitServices(builder.Configuration);
 
+        // 添加健康检查
+        builder.Services.AddHealthCheckServices(builder.Configuration);
+
         return builder;
     }
 
@@ -77,6 +94,20 @@ public static class ProgramExtensions
     {
         // 执行数据库迁移（DbUp：自动运行所有未执行的迁移脚本）
         DatabaseMigrator.MigrateDatabase(app.Configuration);
+
+        // 全局异常处理（必须位于管道最前端，统一将异常转换为 ApiResult 响应）
+        // 使用自定义中间件而非框架 IExceptionHandler 机制（后者在当前运行时版本存在已知的服务解析问题）
+        app.UseMiddleware<GlobalExceptionMiddleware>();
+
+        // 解析反向代理转发头（X-Forwarded-For / X-Forwarded-Proto），
+        // 使 RemoteIpAddress 与 Scheme 反映真实客户端信息，防止伪造的转发头被直接信任
+        app.UseForwardedHeaders();
+
+        // 生产环境启用 HSTS
+        if (!app.Environment.IsDevelopment())
+        {
+            app.UseHsts();
+        }
 
         // 配置 HTTP 请求管道
         // 使用 Swagger 文档
@@ -112,13 +143,17 @@ public static class ProgramExtensions
 
         app.UseHttpsRedirection();
 
-        // 使用限流中间件
+        app.UseAuthentication();
+
+        // 限流中间件必须在认证之后，用户维度限流才能读取到认证信息
         app.UseRateLimitMiddleware();
 
-        app.UseAuthentication();
         app.UseAuthorization();
 
         app.MapControllers();
+
+        // 健康检查端点（/health，供编排系统探活）
+        app.UseHealthCheckEndpoints();
 
         return app;
     }
@@ -250,7 +285,17 @@ public static class ProgramExtensions
             };
         });
 
-        services.AddAuthorization();
+        // 注册授权策略：每个权限点对应一个同名策略，由 PermissionAuthorizationHandler 基于 RBAC 判定
+        services.AddAuthorization(options =>
+        {
+            foreach (var permission in Permissions.All)
+            {
+                options.AddPolicy(permission, policy => policy.AddRequirements(new PermissionRequirement(permission)));
+            }
+        });
+
+        // 权限授权处理器（Scoped：需要注入应用层查询服务）
+        services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
         return services;
     }

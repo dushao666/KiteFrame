@@ -28,6 +28,7 @@ public class PermissionController : ControllerBase
     /// <param name="userId">用户ID</param>
     /// <returns>用户权限信息</returns>
     [HttpGet("user/{userId}")]
+    [Authorize(Policy = Permissions.SystemRoleList)]
     [ProducesResponseType(typeof(ApiResult<UserPermissionDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetUserPermissions(long userId)
@@ -42,6 +43,7 @@ public class PermissionController : ControllerBase
     /// <param name="userId">用户ID</param>
     /// <returns>菜单树</returns>
     [HttpGet("user/{userId}/menus")]
+    [Authorize(Policy = Permissions.SystemRoleList)]
     [ProducesResponseType(typeof(ApiResult<List<MenuDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetUserMenuTree(long userId)
@@ -57,6 +59,7 @@ public class PermissionController : ControllerBase
     /// <param name="permission">权限标识</param>
     /// <returns>是否有权限</returns>
     [HttpGet("user/{userId}/check")]
+    [Authorize(Policy = Permissions.SystemRoleList)]
     [ProducesResponseType(typeof(ApiResult<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> CheckUserPermission(long userId, [FromQuery] string permission)
@@ -70,6 +73,7 @@ public class PermissionController : ControllerBase
     /// </summary>
     /// <returns>菜单列表</returns>
     [HttpGet("menus")]
+    [Authorize(Policy = Permissions.SystemRoleList)]
     [ProducesResponseType(typeof(ApiResult<List<MenuDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAllMenus()
@@ -84,6 +88,7 @@ public class PermissionController : ControllerBase
     /// <param name="roleId">角色ID</param>
     /// <returns>菜单权限列表</returns>
     [HttpGet("role/{roleId}/menus")]
+    [Authorize(Policy = Permissions.SystemRoleList)]
     [ProducesResponseType(typeof(ApiResult<List<long>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetRoleMenuIds(long roleId)

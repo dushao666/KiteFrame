@@ -15,9 +15,9 @@ public class User : BaseEntity
     public string UserName { get; set; } = string.Empty;
 
     /// <summary>
-    /// 密码
+    /// 密码（带盐 PBKDF2 自描述哈希，与数据库列宽 varchar(200) 保持一致）
     /// </summary>
-    [SugarColumn(ColumnDescription = "密码", Length = 100, IsNullable = false)]
+    [SugarColumn(ColumnDescription = "密码", Length = 200, IsNullable = false)]
     public string Password { get; set; } = string.Empty;
 
     /// <summary>

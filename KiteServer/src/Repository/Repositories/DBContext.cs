@@ -34,6 +34,21 @@ public class DBContext : SugarUnitOfWork
     /// 角色菜单关联
     /// </summary>
     public SimpleClient<RoleMenu> RoleMenus { get; set; } = null!;
+
+    /// <summary>
+    /// 登录日志
+    /// </summary>
+    public SimpleClient<LoginLog> LoginLogs { get; set; } = null!;
+
+    /// <summary>
+    /// 在线用户
+    /// </summary>
+    public SimpleClient<OnlineUser> OnlineUsers { get; set; } = null!;
+
+    /// <summary>
+    /// 操作日志
+    /// </summary>
+    public SimpleClient<OperationLog> OperationLogs { get; set; } = null!;
 }
 
 /// <summary>

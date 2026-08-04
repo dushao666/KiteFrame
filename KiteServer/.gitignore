@@ -436,7 +436,9 @@ tmp/
 *.sqlite
 *.sqlite3
 
-# 配置文件（包含敏感信息）
+# 配置文件：默认全部忽略，仅放行以下三个模板文件
+# 注意：放行的文件中禁止存放真实凭据（密码 / 密钥 / 内网地址），
+# 生产敏感配置一律通过环境变量注入（见 appsettings.Production.json 头部说明）
 appsettings.*.json
 !appsettings.json
 !appsettings.Development.json

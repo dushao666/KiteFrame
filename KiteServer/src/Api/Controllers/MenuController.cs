@@ -4,6 +4,7 @@ namespace Api.Controllers;
 /// 菜单管理控制器
 /// </summary>
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class MenuController : ControllerBase
 {
@@ -30,6 +31,7 @@ public class MenuController : ControllerBase
     /// <param name="request">查询请求</param>
     /// <returns>菜单列表</returns>
     [HttpGet]
+    [Authorize(Policy = Permissions.SystemMenuList)]
     [ProducesResponseType(typeof(ApiResult<PagedResult<MenuDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
@@ -45,6 +47,7 @@ public class MenuController : ControllerBase
     /// <param name="id">菜单ID</param>
     /// <returns>菜单信息</returns>
     [HttpGet("{id}")]
+    [Authorize(Policy = Permissions.SystemMenuList)]
     [ProducesResponseType(typeof(ApiResult<MenuDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
@@ -59,6 +62,7 @@ public class MenuController : ControllerBase
     /// </summary>
     /// <returns>菜单树</returns>
     [HttpGet("tree")]
+    [Authorize(Policy = Permissions.SystemMenuList)]
     [ProducesResponseType(typeof(ApiResult<List<MenuDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetMenuTree()
@@ -73,6 +77,7 @@ public class MenuController : ControllerBase
     /// <param name="userId">用户ID</param>
     /// <returns>用户菜单列表</returns>
     [HttpGet("user/{userId}")]
+    [Authorize(Policy = Permissions.SystemMenuList)]
     [ProducesResponseType(typeof(ApiResult<List<MenuDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
@@ -88,6 +93,7 @@ public class MenuController : ControllerBase
     /// <param name="request">菜单信息</param>
     /// <returns>创建结果</returns>
     [HttpPost]
+    [Authorize(Policy = Permissions.SystemMenuAdd)]
     [ProducesResponseType(typeof(ApiResult<long>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status409Conflict)]
@@ -123,6 +129,7 @@ public class MenuController : ControllerBase
     /// <param name="request">菜单信息</param>
     /// <returns>更新结果</returns>
     [HttpPut("{id}")]
+    [Authorize(Policy = Permissions.SystemMenuEdit)]
     [ProducesResponseType(typeof(ApiResult<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status404NotFound)]
@@ -158,6 +165,7 @@ public class MenuController : ControllerBase
     /// <param name="id">菜单ID</param>
     /// <returns>删除结果</returns>
     [HttpDelete("{id}")]
+    [Authorize(Policy = Permissions.SystemMenuDelete)]
     [ProducesResponseType(typeof(ApiResult<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]

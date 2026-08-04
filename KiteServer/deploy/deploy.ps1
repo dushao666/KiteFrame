@@ -1,83 +1,49 @@
 # KiteServer 部署脚本
-# PowerShell 脚本用于自动化部署
+# 部署路径：Docker Compose（Dockerfile 多阶段构建，直接从源码构建镜像）
+# 用法：
+#   .\deploy.ps1            # 构建镜像并启动全部服务
+#   .\deploy.ps1 -NoBuild   # 复用已有镜像直接启动
 
 param(
     [Parameter(Mandatory=$false)]
-    [string]$Environment = "Production",
-    
-    [Parameter(Mandatory=$false)]
-    [switch]$Build = $false,
-    
-    [Parameter(Mandatory=$false)]
-    [switch]$Clean = $false
+    [switch]$NoBuild = $false
 )
 
 Write-Host "🚀 开始部署 KiteServer..." -ForegroundColor Green
-Write-Host "环境: $Environment" -ForegroundColor Yellow
-
-# 设置变量
-$ProjectRoot = Split-Path -Parent $PSScriptRoot
-$ApiProject = Join-Path $ProjectRoot "src\Api\Api.csproj"
-$PublishPath = Join-Path $PSScriptRoot "publish"
 
 try {
-    # 清理旧的发布文件
-    if ($Clean -and (Test-Path $PublishPath)) {
-        Write-Host "🧹 清理旧的发布文件..." -ForegroundColor Yellow
-        Remove-Item -Path $PublishPath -Recurse -Force
-    }
-
-    # 构建项目
-    if ($Build) {
-        Write-Host "🔨 构建项目..." -ForegroundColor Yellow
-        Set-Location $ProjectRoot
-        dotnet clean
-        dotnet restore
-        dotnet build --configuration Release
-        
-        if ($LASTEXITCODE -ne 0) {
-            throw "构建失败"
-        }
-    }
-
-    # 发布项目
-    Write-Host "📦 发布项目..." -ForegroundColor Yellow
-    dotnet publish $ApiProject `
-        --configuration Release `
-        --output $PublishPath `
-        --no-build:$(!$Build) `
-        --verbosity minimal
-
-    if ($LASTEXITCODE -ne 0) {
-        throw "发布失败"
-    }
-
-    # 复制配置文件
-    Write-Host "📋 复制配置文件..." -ForegroundColor Yellow
-    $ConfigSource = Join-Path $ProjectRoot "src\Api\appsettings.$Environment.json"
-    $ConfigTarget = Join-Path $PublishPath "appsettings.json"
-    
-    if (Test-Path $ConfigSource) {
-        Copy-Item $ConfigSource $ConfigTarget -Force
-    }
-
-    # 启动 Docker 容器
-    Write-Host "🐳 启动 Docker 容器..." -ForegroundColor Yellow
     Set-Location $PSScriptRoot
-    docker-compose down
-    docker-compose up -d --build
+
+    # 检查 .env 文件（敏感凭据来源，禁止入库）
+    if (-not (Test-Path (Join-Path $PSScriptRoot ".env"))) {
+        Write-Host "❌ 未找到 .env 文件。请先复制 .env.example 为 .env 并修改其中的密码后再部署。" -ForegroundColor Red
+        exit 1
+    }
+
+    # 停止旧容器
+    Write-Host "🛑 停止旧容器..." -ForegroundColor Yellow
+    docker compose down
+
+    # 构建并启动
+    if ($NoBuild) {
+        Write-Host "🐳 复用已有镜像启动..." -ForegroundColor Yellow
+        docker compose up -d
+    } else {
+        Write-Host "🐳 构建镜像并启动..." -ForegroundColor Yellow
+        docker compose up -d --build
+    }
 
     if ($LASTEXITCODE -ne 0) {
         throw "Docker 启动失败"
     }
 
+    # 显示服务状态
+    docker compose ps
+
     Write-Host "✅ 部署完成!" -ForegroundColor Green
     Write-Host "API 地址: http://localhost:8080" -ForegroundColor Cyan
-    Write-Host "文档地址: http://localhost:8080" -ForegroundColor Cyan
 
 } catch {
     Write-Host "❌ 部署失败: $_" -ForegroundColor Red
     exit 1
-} finally {
-    Set-Location $ProjectRoot
 }

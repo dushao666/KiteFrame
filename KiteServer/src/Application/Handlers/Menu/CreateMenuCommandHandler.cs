@@ -10,11 +10,22 @@ public class CreateMenuCommandHandler : IRequestHandler<CreateMenuCommand, ApiRe
     private readonly ISugarUnitOfWork<DBContext> _unitOfWork;
     private readonly ILogger<CreateMenuCommandHandler> _logger;
 
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+
     public CreateMenuCommandHandler(ISugarUnitOfWork<DBContext> unitOfWork, ILogger<CreateMenuCommandHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _logger = logger;
     }
+
+    /// <summary>
+    /// 处理命令
+    /// </summary>
+    /// <param name="request">命令</param>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <returns>处理结果</returns>
 
     public async Task<ApiResult<long>> Handle(CreateMenuCommand request, CancellationToken cancellationToken)
     {

@@ -9,13 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- 中介者（与 Application / Shared 保持同一版本） -->
+    <PackageReference Include="MediatR" Version="12.4.1" />
+
     <!-- API 文档 -->
-    <PackageReference Include="MediatR" Version="13.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.6" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.8.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="7.2.0" />
     <PackageReference Include="IGeekFan.AspNetCore.Knife4jUI" Version="0.0.16" />
-    <PackageReference Include="Scalar.AspNetCore" Version="1.2.42" />
 
     <!-- 日志 -->
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
@@ -25,26 +26,14 @@
     <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
     <PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0" />
 
-    <!-- 验证 -->
-    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
-
     <!-- JWT 认证 -->
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.2.1" />
-
-    <!-- CORS -->
-    <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
-
-    <!-- 限流 -->
-    <PackageReference Include="AspNetCoreRateLimit" Version="5.0.0" />
 
     <!-- 健康检查 -->
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="9.0.0" />
     <PackageReference Include="AspNetCore.HealthChecks.MySql" Version="8.0.1" />
     <PackageReference Include="AspNetCore.HealthChecks.Redis" Version="8.0.1" />
-
-    <!-- 压缩 -->
-    <PackageReference Include="Microsoft.AspNetCore.ResponseCompression" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -12,6 +12,10 @@ public class CreateRoleCommandHandler : IRequestHandler<CreateRoleCommand, ApiRe
     private readonly ILogger<CreateRoleCommandHandler> _logger;
     private readonly IRoleQueries _roleQueries;
 
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+
     public CreateRoleCommandHandler(
         ISugarUnitOfWork<DBContext> unitOfWork, 
         ILogger<CreateRoleCommandHandler> logger,
@@ -21,6 +25,13 @@ public class CreateRoleCommandHandler : IRequestHandler<CreateRoleCommand, ApiRe
         _logger = logger;
         _roleQueries = roleQueries;
     }
+
+    /// <summary>
+    /// 处理命令
+    /// </summary>
+    /// <param name="request">命令</param>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <returns>处理结果</returns>
 
     public async Task<ApiResult<long>> Handle(CreateRoleCommand request, CancellationToken cancellationToken)
     {

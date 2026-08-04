@@ -41,6 +41,7 @@ global using Shared.Events;
 
 // 项目特定命名空间
 global using Shared.Configuration;
+global using Shared.Constants;
 global using Shared.Models;
 global using Shared.Models.Dtos;
 global using Shared.Enums;
@@ -51,6 +52,7 @@ global using Repository.Migrations;
 global using Infrastructure.Extensions;
 global using Infrastructure.Exceptions;
 global using Api.Extensions;
+global using Api.Middleware;
 
 // JWT
 global using Microsoft.IdentityModel.Tokens;

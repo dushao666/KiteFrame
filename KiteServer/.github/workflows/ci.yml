@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+
+jobs:
+  build-and-test:
+    name: 构建与测试
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: 还原依赖
+        run: dotnet restore KiteServer.sln
+
+      - name: 构建
+        run: dotnet build KiteServer.sln --configuration Release --no-restore
+
+      - name: 运行测试
+        run: dotnet test KiteServer.sln --configuration Release --no-build --verbosity normal
+
+      - name: 检查存在已知漏洞的依赖
+        run: dotnet list KiteServer.sln package --vulnerable --include-transitive

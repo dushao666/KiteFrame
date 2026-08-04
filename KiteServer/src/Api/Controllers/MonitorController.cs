@@ -32,6 +32,7 @@ public class MonitorController : ControllerBase
     /// <param name="request">查询请求</param>
     /// <returns>在线用户列表</returns>
     [HttpGet("online/users")]
+    [Authorize(Policy = Permissions.MonitorOnlineList)]
     [ProducesResponseType(typeof(ApiResult<PagedResult<OnlineUserDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
@@ -47,6 +48,7 @@ public class MonitorController : ControllerBase
     /// <param name="sessionId">会话ID</param>
     /// <returns>操作结果</returns>
     [HttpPost("online/logout/{sessionId}")]
+    [Authorize(Policy = Permissions.MonitorOnlineLogout)]
     [OperationLog("在线用户", "强制下线")]
     [ProducesResponseType(typeof(ApiResult<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
@@ -91,6 +93,7 @@ public class MonitorController : ControllerBase
     /// <param name="request">查询请求</param>
     /// <returns>登录日志列表</returns>
     [HttpGet("loginlogs")]
+    [Authorize(Policy = Permissions.MonitorLoginLogList)]
     [ProducesResponseType(typeof(ApiResult<PagedResult<LoginLogDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
@@ -106,6 +109,7 @@ public class MonitorController : ControllerBase
     /// <param name="ids">日志ID列表</param>
     /// <returns>操作结果</returns>
     [HttpDelete("loginlogs")]
+    [Authorize(Policy = Permissions.MonitorLoginLogDelete)]
     [ProducesResponseType(typeof(ApiResult<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
@@ -125,6 +129,7 @@ public class MonitorController : ControllerBase
     /// </summary>
     /// <returns>操作结果</returns>
     [HttpDelete("loginlogs/clear")]
+    [Authorize(Policy = Permissions.MonitorLoginLogClear)]
     [ProducesResponseType(typeof(ApiResult<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> ClearLoginLogs()
@@ -139,6 +144,7 @@ public class MonitorController : ControllerBase
     /// <param name="request">查询请求</param>
     /// <returns>操作日志列表</returns>
     [HttpGet("operationlogs")]
+    [Authorize(Policy = Permissions.MonitorOperLogList)]
     [ProducesResponseType(typeof(ApiResult<PagedResult<OperationLogDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
@@ -154,6 +160,7 @@ public class MonitorController : ControllerBase
     /// <param name="ids">日志ID列表</param>
     /// <returns>操作结果</returns>
     [HttpDelete("operationlogs")]
+    [Authorize(Policy = Permissions.MonitorOperLogDelete)]
     [ProducesResponseType(typeof(ApiResult<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
@@ -173,6 +180,7 @@ public class MonitorController : ControllerBase
     /// </summary>
     /// <returns>操作结果</returns>
     [HttpDelete("operationlogs/clear")]
+    [Authorize(Policy = Permissions.MonitorOperLogClear)]
     [ProducesResponseType(typeof(ApiResult<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> ClearOperationLogs()

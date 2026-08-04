@@ -1,0 +1,26 @@
+# KiteServer 代码风格配置（与 docs/项目开发规范.md 保持一致）
+root = true
+
+[*]
+charset = utf-8
+end_of_line = crlf
+insert_final_newline = false
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+
+[*.cs]
+# C# 风格：文件范围命名空间、var 偏好、空值检查等由编译器/Nullable 保障
+dotnet_sort_system_directives_first = false
+csharp_style_namespace_declarations = file_scoped:warning
+csharp_prefer_braces = true:warning
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_expression_bodied_methods = false:suggestion
+dotnet_style_require_accessibility_modifiers = always:warning
+
+# 缩进例外：csproj / json / yml 使用 2 空格
+[*.{csproj,props,targets,json,yml,yaml}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false

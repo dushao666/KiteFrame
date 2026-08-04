@@ -143,7 +143,7 @@ internal class ParameterRebinder : ExpressionVisitor
     /// <returns>访问后的表达式</returns>
     protected override Expression VisitParameter(ParameterExpression p)
     {
-        if (_map.TryGetValue(p, out ParameterExpression replacement))
+        if (_map.TryGetValue(p, out ParameterExpression? replacement) && replacement is not null)
         {
             p = replacement;
         }

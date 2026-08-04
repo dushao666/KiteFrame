@@ -4,6 +4,7 @@ namespace Api.Controllers;
 /// 用户管理控制器
 /// </summary>
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class UserController : ControllerBase
 {
@@ -30,6 +31,7 @@ public class UserController : ControllerBase
     /// <param name="request">查询请求</param>
     /// <returns>用户列表</returns>
     [HttpGet]
+    [Authorize(Policy = Permissions.SystemUserList)]
     [ProducesResponseType(typeof(ApiResult<PagedResult<UserDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
@@ -45,6 +47,7 @@ public class UserController : ControllerBase
     /// <param name="id">用户ID</param>
     /// <returns>用户信息</returns>
     [HttpGet("{id}")]
+    [Authorize(Policy = Permissions.SystemUserList)]
     [ProducesResponseType(typeof(ApiResult<UserDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
@@ -60,6 +63,7 @@ public class UserController : ControllerBase
     /// <param name="request">用户信息</param>
     /// <returns>创建结果</returns>
     [HttpPost]
+    [Authorize(Policy = Permissions.SystemUserAdd)]
     [ProducesResponseType(typeof(ApiResult<long>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status409Conflict)]
@@ -89,6 +93,7 @@ public class UserController : ControllerBase
     /// <param name="request">用户信息</param>
     /// <returns>更新结果</returns>
     [HttpPut("{id}")]
+    [Authorize(Policy = Permissions.SystemUserEdit)]
     [ProducesResponseType(typeof(ApiResult<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status404NotFound)]
@@ -117,6 +122,7 @@ public class UserController : ControllerBase
     /// <param name="id">用户ID</param>
     /// <returns>删除结果</returns>
     [HttpDelete("{id}")]
+    [Authorize(Policy = Permissions.SystemUserDelete)]
     [ProducesResponseType(typeof(ApiResult<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
@@ -133,6 +139,7 @@ public class UserController : ControllerBase
     /// <param name="id">用户ID</param>
     /// <returns>角色ID列表</returns>
     [HttpGet("{id}/roles")]
+    [Authorize(Policy = Permissions.SystemUserList)]
     [ProducesResponseType(typeof(ApiResult<List<long>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
@@ -149,6 +156,7 @@ public class UserController : ControllerBase
     /// <param name="request">角色分配请求</param>
     /// <returns>分配结果</returns>
     [HttpPost("{id}/roles")]
+    [Authorize(Policy = Permissions.SystemUserRole)]
     [ProducesResponseType(typeof(ApiResult<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResult), StatusCodes.Status404NotFound)]

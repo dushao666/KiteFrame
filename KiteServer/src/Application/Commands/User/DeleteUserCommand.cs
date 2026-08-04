@@ -10,6 +10,10 @@ public class DeleteUserCommand : IRequest<ApiResult<bool>>
     /// </summary>
     public long Id { get; set; }
 
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+
     public DeleteUserCommand(long id)
     {
         Id = id;

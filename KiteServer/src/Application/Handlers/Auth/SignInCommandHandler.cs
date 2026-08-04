@@ -34,6 +34,13 @@ public class SignInCommandHandler : IRequestHandler<SignInCommand, LoginUserDto>
         _permissionQueries = permissionQueries;
     }
 
+    /// <summary>
+    /// 处理命令
+    /// </summary>
+    /// <param name="request">命令</param>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <returns>处理结果</returns>
+
     public async Task<LoginUserDto> Handle(SignInCommand request, CancellationToken cancellationToken)
     {
         try
@@ -117,14 +124,50 @@ public class SignInCommandHandler : IRequestHandler<SignInCommand, LoginUserDto>
     {
         using var context = _unitOfWork.CreateContext(false);
 
-        // 对密码进行SHA512加密
-        var hashedPassword = EncryptionHelper.Sha512(request.Password!);
+        // 按用户名查找用户（不将密码哈希拼进查询条件，以支持带盐哈希验证）
+        var user = await context.Users.GetFirstAsync(x => x.UserName == request.UserName);
+        if (user == null)
+        {
+            return null;
+        }
 
-        var user = await context.Users.GetFirstAsync(x =>
-            x.UserName == request.UserName &&
-            x.Password == hashedPassword);
+        // 验证密码（兼容历史遗留的无盐 SHA512 哈希）
+        var verifyResult = PasswordHasher.VerifyPassword(request.Password!, user.Password);
+        if (verifyResult == PasswordVerificationResult.Failed)
+        {
+            return null;
+        }
+
+        // 旧算法哈希验证通过后，自动升级为当前算法重新哈希，失败不影响本次登录
+        if (verifyResult == PasswordVerificationResult.SuccessRehashNeeded)
+        {
+            await UpgradePasswordHashAsync(user, request.Password!);
+        }
 
         return user;
+    }
+
+    /// <summary>
+    /// 将旧算法存储的密码哈希升级为当前算法
+    /// </summary>
+    /// <param name="user">用户实体</param>
+    /// <param name="plainPassword">本次登录提供的明文密码</param>
+    private async Task UpgradePasswordHashAsync(Domain.Entities.User user, string plainPassword)
+    {
+        try
+        {
+            using var context = _unitOfWork.CreateContext();
+
+            user.Password = PasswordHasher.HashPassword(plainPassword);
+            await context.Users.UpdateAsync(user);
+            context.Commit();
+
+            _logger.LogInformation("用户 {UserId} 的密码哈希已升级为当前算法", user.Id);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "升级用户 {UserId} 的密码哈希失败", user.Id);
+        }
     }
 
     /// <summary>
@@ -190,6 +233,7 @@ public class SignInCommandHandler : IRequestHandler<SignInCommand, LoginUserDto>
         user.LastLoginIp = clientIp;
 
         await context.Users.UpdateAsync(user);
+        context.Commit();
     }
 
     /// <summary>
@@ -279,7 +323,7 @@ public class SignInCommandHandler : IRequestHandler<SignInCommand, LoginUserDto>
             var loginEvent = new UserLoginEvent
             {
                 UserId = user?.Id ?? 0,
-                UserName = user?.UserName ?? request.UserName,
+                UserName = user?.UserName ?? request.UserName ?? string.Empty,
                 RealName = user?.RealName,
                 DeptId = null, // TODO: 添加部门字段到User实体
                 DeptName = null, // TODO: 添加部门字段到User实体

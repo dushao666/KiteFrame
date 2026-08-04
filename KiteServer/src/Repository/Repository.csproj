@@ -8,7 +8,8 @@
 
   <ItemGroup>
     <PackageReference Include="SqlSugarCoreNoDrive" Version="5.1.4.169" />
-    <PackageReference Include="MySql.Data" Version="8.4.0" />
+    <!-- 9.x 修复了 8.4.0 的已知漏洞 CVE-2024-21170 -->
+    <PackageReference Include="MySql.Data" Version="9.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
     <!-- 数据库迁移（Flyway 式 SQL 脚本，启动时自动执行） -->
