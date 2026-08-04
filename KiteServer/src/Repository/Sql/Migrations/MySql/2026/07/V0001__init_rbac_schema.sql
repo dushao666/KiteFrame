@@ -396,16 +396,7 @@ INSERT IGNORE INTO `sys_menu` (
 -- 二级菜单：操作日志
 (48, 42, '操作日志', 'monitor-operlog', 2, '/monitor/operlog', '/src/views/monitor/operlog/index.vue', 'ep:document', 3, 1, 1, 0, 1, 'monitor:operlog:list', '操作日志查看'),
 (49, 48, '删除日志', 'monitor-operlog-delete', 3, NULL, NULL, NULL, 1, 1, 0, 0, 1, 'monitor:operlog:delete', '删除操作日志按钮'),
-(50, 48, '清空日志', 'monitor-operlog-clear', 3, NULL, NULL, NULL, 2, 1, 0, 0, 1, 'monitor:operlog:clear', '清空操作日志按钮'),
-
--- 一级菜单：系统工具
-(51, 0, '系统工具', 'tool', 1, '/tool', NULL, 'ep:tools', 5, 1, 0, 0, 1, NULL, '系统工具目录'),
-
--- 二级菜单：代码生成
-(52, 51, '代码生成', 'tool-gen', 2, '/tool/gen', '/src/views/tool/gen/index.vue', 'ep:cpu', 1, 1, 1, 0, 1, 'tool:gen:list', '代码生成工具'),
-(53, 52, '生成代码', 'tool-gen-code', 3, NULL, NULL, NULL, 1, 1, 0, 0, 1, 'tool:gen:code', '生成代码按钮'),
-(54, 52, '预览代码', 'tool-gen-preview', 3, NULL, NULL, NULL, 2, 1, 0, 0, 1, 'tool:gen:preview', '预览代码按钮'),
-(55, 52, '下载代码', 'tool-gen-download', 3, NULL, NULL, NULL, 3, 1, 0, 0, 1, 'tool:gen:download', '下载代码按钮');
+(50, 48, '清空日志', 'monitor-operlog-clear', 3, NULL, NULL, NULL, 2, 1, 0, 0, 1, 'monitor:operlog:clear', '清空操作日志按钮');
 
 -- 分配用户角色
 INSERT IGNORE INTO `sys_user_role` (`UserId`, `RoleId`, `CreateUserId`) VALUES
@@ -421,7 +412,7 @@ INSERT IGNORE INTO `sys_role_menu` (`RoleId`, `MenuId`, `CreateUserId`) VALUES
 (1, 1, 1), (1, 2, 1), (1, 3, 1), (1, 4, 1), (1, 5, 1), (1, 6, 1), (1, 7, 1), (1, 8, 1),
 (1, 9, 1), (1, 10, 1), (1, 11, 1), (1, 12, 1), (1, 13, 1), (1, 14, 1), (1, 15, 1), (1, 16, 1), (1, 17, 1),
 (1, 35, 1), (1, 36, 1), (1, 37, 1), (1, 38, 1), (1, 39, 1), (1, 40, 1), (1, 41, 1), (1, 42, 1), (1, 43, 1), (1, 44, 1),
-(1, 45, 1), (1, 46, 1), (1, 47, 1), (1, 48, 1), (1, 49, 1), (1, 50, 1), (1, 51, 1), (1, 52, 1), (1, 53, 1), (1, 54, 1), (1, 55, 1),
+(1, 45, 1), (1, 46, 1), (1, 47, 1), (1, 48, 1), (1, 49, 1), (1, 50, 1),
 
 -- 系统管理员拥有系统管理相关权限
 (2, 1, 1), (2, 2, 1), (2, 3, 1), (2, 4, 1), (2, 5, 1), (2, 6, 1), (2, 7, 1), (2, 8, 1),
