@@ -100,8 +100,10 @@ public static class PasswordHasher
         // 历史遗留：无盐 SHA512（128 位十六进制字符串）
         if (storedHash.Length == 128 && IsHexString(storedHash))
         {
-            var computed = EncryptionHelper.Sha512(password);
-            return FixedTimeEquals(computed, storedHash)
+            // 存储的哈希大小写不固定（种子数据为小写十六进制，EncryptionHelper.Sha512 输出大写），
+            // 统一转为小写后再做常量时间比较
+            var computed = EncryptionHelper.Sha512(password).ToLowerInvariant();
+            return FixedTimeEquals(computed, storedHash.ToLowerInvariant())
                 ? PasswordVerificationResult.SuccessRehashNeeded
                 : PasswordVerificationResult.Failed;
         }
