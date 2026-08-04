@@ -20,6 +20,9 @@ global using Serilog;
 global using DbUp;
 global using DbUp.Engine.Output;
 
+// MySQL 连接（与 dbup-mysql 内部所用连接库一致，用于连接字符串解析）
+global using MySqlConnector;
+
 // 项目特定命名空间
 global using Shared.Configuration;
 global using Domain.Entities;

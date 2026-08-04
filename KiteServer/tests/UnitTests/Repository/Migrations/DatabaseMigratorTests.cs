@@ -42,6 +42,28 @@ public class DatabaseMigratorTests
         Assert.Throws<ArgumentOutOfRangeException>(() => DatabaseMigrator.GetDialectFolder((DatabaseType)999));
     }
 
+    [Theory(DisplayName = "数据库名解析：从 MySQL 连接字符串提取 Database（含键名别名与大小写差异）")]
+    [InlineData("Server=localhost;Port=3306;Database=kite_test;Uid=root;Pwd=123456;CharSet=utf8mb4;", "kite_test")]
+    [InlineData("server=127.0.0.1;database=kite_log;uid=root;pwd=123456", "kite_log")]
+    [InlineData("Server=localhost;Initial Catalog=kite_test;Uid=root;Pwd=123456;", "kite_test")]
+    public void GetMySqlDatabaseName_ConnectionStringWithDatabase_ReturnsDatabaseName(string connectionString, string expected)
+    {
+        // 执行
+        var databaseName = DatabaseMigrator.GetMySqlDatabaseName(connectionString);
+
+        // 断言
+        Assert.Equal(expected, databaseName);
+    }
+
+    [Theory(DisplayName = "数据库名解析：连接字符串缺少 Database 时抛出 InvalidOperationException")]
+    [InlineData("Server=localhost;Port=3306;Uid=root;Pwd=123456;CharSet=utf8mb4;")]
+    [InlineData("")]
+    public void GetMySqlDatabaseName_MissingDatabase_Throws(string connectionString)
+    {
+        // 准备 & 执行 & 断言
+        Assert.Throws<InvalidOperationException>(() => DatabaseMigrator.GetMySqlDatabaseName(connectionString));
+    }
+
     [Theory(DisplayName = "脚本资源前缀：根前缀 + 方言目录 + 点号")]
     [InlineData(DatabaseType.MySQL, "Repository.Sql.Migrations.MySql.")]
     [InlineData(DatabaseType.PostgreSQL, "Repository.Sql.Migrations.PostgreSQL.")]

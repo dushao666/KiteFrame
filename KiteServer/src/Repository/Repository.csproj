@@ -15,6 +15,9 @@
     <!-- 数据库迁移（Flyway 式 SQL 脚本，启动时自动执行） -->
     <PackageReference Include="dbup-core" Version="6.1.1" />
     <PackageReference Include="dbup-mysql" Version="6.1.0" />
+    <!-- MySQL 连接字符串解析（迁移版本表需以库名限定）；
+         与 dbup-mysql 内部所用连接库一致，显式引用以固定版本（原为传递依赖） -->
+    <PackageReference Include="MySqlConnector" Version="2.3.5" />
     <!-- 迁移执行器日志（与程序入口的静态 Log.* 保持一致） -->
     <PackageReference Include="Serilog" Version="4.2.0" />
   </ItemGroup>
