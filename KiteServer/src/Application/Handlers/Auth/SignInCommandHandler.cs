@@ -1,6 +1,3 @@
-using Application.Queries.Permission.Interfaces;
-using Shared.Events;
-
 namespace Application.Handlers.Auth;
 
 /// <summary>

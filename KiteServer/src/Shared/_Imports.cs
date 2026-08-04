@@ -12,7 +12,11 @@ global using System.Text.Json;
 global using System.ComponentModel;
 global using System.ComponentModel.DataAnnotations;
 
+// MediatR（事件定义实现 INotification）
+global using MediatR;
+
 // 项目特定命名空间
 global using Shared.Configuration;
 global using Shared.Constants;
 global using Shared.Enums;
+global using Shared.Models.Dtos;

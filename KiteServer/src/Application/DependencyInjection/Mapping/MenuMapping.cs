@@ -1,7 +1,3 @@
-using Mapster;
-using Domain.Entities;
-using Shared.Models.Dtos;
-
 namespace Application.DependencyInjection.Mapping;
 
 /// <summary>

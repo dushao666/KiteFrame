@@ -1,8 +1,3 @@
-using Application.Commands.Auth;
-using Application.Validators.Auth;
-using FluentValidation;
-using Shared.Enums;
-
 namespace UnitTests.Validators.Auth;
 
 /// <summary>

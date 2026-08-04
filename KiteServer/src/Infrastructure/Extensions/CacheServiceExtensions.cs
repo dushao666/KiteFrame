@@ -1,5 +1,3 @@
-using Serilog;
-
 namespace Infrastructure.Extensions;
 
 /// <summary>
@@ -98,8 +96,8 @@ public static class CacheServiceExtensions
             catch (Exception ex)
             {
                 // 注册阶段不得调用 BuildServiceProvider（会创建与最终容器隔离的第二个容器），
-                // 此处使用 Serilog 静态日志（与程序入口一致）
-                Log.Error(ex, "Redis缓存配置失败，将禁用Redis缓存");
+                // 此处使用 Serilog 静态日志（与程序入口一致）；完全限定以避免与 Microsoft.Extensions.Logging 的同名类型歧义
+                Serilog.Log.Error(ex, "Redis缓存配置失败，将禁用Redis缓存");
             }
         }
 

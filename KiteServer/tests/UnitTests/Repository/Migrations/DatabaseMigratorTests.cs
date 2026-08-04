@@ -1,6 +1,3 @@
-using Repository.Migrations;
-using Shared.Configuration;
-
 namespace UnitTests.Repository.Migrations;
 
 /// <summary>

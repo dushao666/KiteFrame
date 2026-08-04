@@ -10,6 +10,11 @@ global using System.Threading.Tasks;
 global using System.Text;
 global using System.Text.Json;
 global using System.Linq.Expressions;
+global using System.ComponentModel;
+global using System.Diagnostics;
+global using System.Reflection;
+global using System.Security.Claims;
+global using System.Security.Cryptography;
 
 // Microsoft Extensions
 global using Microsoft.Extensions.Configuration;
@@ -17,8 +22,16 @@ global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Logging;
 global using Microsoft.Extensions.Options;
 
+// MediatR
+global using MediatR;
+
+// JWT
+global using Microsoft.IdentityModel.Tokens;
+global using System.IdentityModel.Tokens.Jwt;
+
 // ASP.NET Core
 global using Microsoft.AspNetCore.Http;
+global using Microsoft.AspNetCore.Mvc.Filters;
 
 // 缓存
 global using Microsoft.Extensions.Caching.Memory;
@@ -31,6 +44,8 @@ global using System.Collections.Concurrent;
 
 // 项目引用
 global using Shared.Configuration;
+global using Shared.Attributes;
+global using Shared.Events;
 global using Infrastructure.Services;
 
 // Infrastructure 扩展方法和工具类

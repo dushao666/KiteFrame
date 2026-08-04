@@ -20,6 +20,11 @@ global using Microsoft.AspNetCore.Mvc.Controllers;
 global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
 global using Microsoft.AspNetCore.RateLimiting;
+global using Microsoft.AspNetCore.HttpOverrides;
+
+// 健康检查
+global using HealthChecks.MySql;
+global using HealthChecks.Redis;
 
 // Swagger/OpenAPI
 global using Swashbuckle.AspNetCore.Annotations;
@@ -51,6 +56,7 @@ global using Repository.Extensions;
 global using Repository.Migrations;
 global using Infrastructure.Extensions;
 global using Infrastructure.Exceptions;
+global using Api.Authorization;
 global using Api.Extensions;
 global using Api.Middleware;
 

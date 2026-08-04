@@ -1,5 +1,3 @@
-using Shared.Models.Menu;
-
 namespace Application.Queries.Menu;
 
 /// <summary>

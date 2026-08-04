@@ -1,5 +1,3 @@
-using Application.Commands.User;
-
 namespace Application.Handlers.User;
 
 /// <summary>

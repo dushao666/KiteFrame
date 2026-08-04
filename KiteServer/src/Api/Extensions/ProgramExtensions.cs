@@ -1,7 +1,3 @@
-using Api.Authorization;
-using Microsoft.AspNetCore.HttpOverrides;
-using Shared.Constants;
-
 namespace Api.Extensions;
 
 /// <summary>

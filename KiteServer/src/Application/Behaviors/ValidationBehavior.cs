@@ -1,6 +1,3 @@
-using FluentValidation;
-using ValidationException = Infrastructure.Exceptions.ValidationException;
-
 namespace Application.Behaviors;
 
 /// <summary>

@@ -1,7 +1,3 @@
-using Application.Commands.Auth;
-using Application.Validators.Auth;
-using FluentValidation;
-
 namespace UnitTests.Validators.Auth;
 
 /// <summary>

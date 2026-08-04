@@ -1,8 +1,3 @@
-using Application.Queries.Monitor.Interfaces;
-using Shared.Models.Monitor;
-using Shared.Models.Dtos;
-using Domain.Entities;
-
 namespace Application.Queries.Monitor;
 
 /// <summary>

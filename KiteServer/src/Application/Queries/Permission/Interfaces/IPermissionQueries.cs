@@ -1,5 +1,3 @@
-using Shared.Models.Permission;
-
 namespace Application.Queries.Permission.Interfaces;
 
 /// <summary>

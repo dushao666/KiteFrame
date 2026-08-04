@@ -1,6 +1,3 @@
-using Application.Commands.Role;
-using Application.Queries.Role.Interfaces;
-
 namespace Application.Handlers.Role;
 
 /// <summary>

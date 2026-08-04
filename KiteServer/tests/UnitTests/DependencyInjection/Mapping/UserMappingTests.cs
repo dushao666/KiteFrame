@@ -1,9 +1,3 @@
-using Application.Commands.User;
-using Application.DependencyInjection.Mapping;
-using Domain.Entities;
-using Mapster;
-using Shared.Models.User;
-
 namespace UnitTests.DependencyInjection.Mapping;
 
 /// <summary>

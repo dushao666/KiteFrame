@@ -1,5 +1,3 @@
-using DbUp.Engine.Output;
-
 namespace Repository.Migrations;
 
 /// <summary>

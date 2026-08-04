@@ -1,5 +1,3 @@
-using Shared.Models.Dtos;
-
 namespace Shared.Models.Permission;
 
 /// <summary>

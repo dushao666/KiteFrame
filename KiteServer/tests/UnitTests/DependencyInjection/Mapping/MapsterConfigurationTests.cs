@@ -1,6 +1,3 @@
-using Application.DependencyInjection.Mapping;
-using Mapster;
-
 namespace UnitTests.DependencyInjection.Mapping;
 
 /// <summary>

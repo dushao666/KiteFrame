@@ -1,5 +1,3 @@
-using MediatR;
-
 namespace Shared.Events;
 
 /// <summary>

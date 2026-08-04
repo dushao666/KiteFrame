@@ -1,5 +1,3 @@
-using Domain.Entities.Base;
-
 namespace Domain.Entities;
 
 /// <summary>

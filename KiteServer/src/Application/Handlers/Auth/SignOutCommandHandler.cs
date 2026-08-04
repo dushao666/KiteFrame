@@ -1,5 +1,3 @@
-using Shared.Events;
-
 namespace Application.Handlers.Auth;
 
 /// <summary>

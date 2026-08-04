@@ -1,6 +1,3 @@
-using Application.Commands.Auth;
-using FluentValidation;
-
 namespace Application.Validators.Auth;
 
 /// <summary>

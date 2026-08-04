@@ -1,9 +1,3 @@
-using Application.DependencyInjection.Mapping;
-using Domain.Entities;
-using Mapster;
-using Shared.Enums;
-using Shared.Models.Dtos;
-
 namespace UnitTests.DependencyInjection.Mapping;
 
 /// <summary>

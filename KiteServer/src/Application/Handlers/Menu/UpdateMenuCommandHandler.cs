@@ -1,5 +1,3 @@
-using Application.Commands.Menu;
-
 namespace Application.Handlers.Menu;
 
 /// <summary>

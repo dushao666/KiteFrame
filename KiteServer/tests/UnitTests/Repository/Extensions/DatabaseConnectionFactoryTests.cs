@@ -1,8 +1,3 @@
-using Microsoft.Extensions.Configuration;
-using Repository.Extensions;
-using Shared.Configuration;
-using SqlSugar;
-
 namespace UnitTests.Repository.Extensions;
 
 /// <summary>

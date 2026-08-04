@@ -1,6 +1,3 @@
-using DbUp;
-using Repository.Extensions;
-
 namespace Repository.Migrations;
 
 /// <summary>

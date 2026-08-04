@@ -1,8 +1,3 @@
-using Mapster;
-using Application.Commands.User;
-using Domain.Entities;
-using Shared.Models.User;
-
 namespace Application.DependencyInjection.Mapping;
 
 /// <summary>

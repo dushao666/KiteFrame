@@ -1,11 +1,3 @@
-using Microsoft.AspNetCore.Mvc.Filters;
-using Shared.Attributes;
-using Shared.Events;
-using System.Diagnostics;
-using System.Text.Json;
-using System.Security.Claims;
-using MediatR;
-
 namespace Infrastructure.Filters;
 
 /// <summary>

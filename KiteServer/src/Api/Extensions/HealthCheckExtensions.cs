@@ -1,6 +1,3 @@
-using HealthChecks.MySql;
-using HealthChecks.Redis;
-
 namespace Api.Extensions;
 
 /// <summary>

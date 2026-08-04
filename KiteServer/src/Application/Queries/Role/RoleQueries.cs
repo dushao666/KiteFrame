@@ -1,5 +1,3 @@
-using Shared.Models.Role;
-
 namespace Application.Queries.Role;
 
 /// <summary>

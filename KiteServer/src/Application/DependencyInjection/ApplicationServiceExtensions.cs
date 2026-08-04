@@ -1,8 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
-using Application.Behaviors;
-using Application.DependencyInjection.Mapping;
-using FluentValidation;
 
 namespace Application.DependencyInjection;
 

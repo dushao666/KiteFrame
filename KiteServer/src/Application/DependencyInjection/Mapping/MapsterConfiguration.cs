@@ -1,5 +1,3 @@
-using Mapster;
-
 namespace Application.DependencyInjection.Mapping;
 
 /// <summary>

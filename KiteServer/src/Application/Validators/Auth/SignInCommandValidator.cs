@@ -1,7 +1,3 @@
-using Application.Commands.Auth;
-using FluentValidation;
-using Shared.Enums;
-
 namespace Application.Validators.Auth;
 
 /// <summary>

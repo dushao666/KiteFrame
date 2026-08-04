@@ -1,5 +1,3 @@
-using Shared.Models.User;
-
 namespace Application.Commands.User;
 
 /// <summary>

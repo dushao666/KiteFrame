@@ -1,6 +1,3 @@
-using Shared.Models.User;
-
-
 namespace Application.Queries.User;
 
 /// <summary>

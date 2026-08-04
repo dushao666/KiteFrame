@@ -1,5 +1,3 @@
-using Application.Commands.Role;
-
 namespace Application.Handlers.Role;
 
 /// <summary>

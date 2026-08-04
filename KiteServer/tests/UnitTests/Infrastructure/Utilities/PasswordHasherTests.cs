@@ -1,5 +1,3 @@
-using Infrastructure.Utilities;
-
 namespace UnitTests.Infrastructure.Utilities;
 
 /// <summary>
