@@ -9,10 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{F8B7E1A2
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{D1E2F3A4-5B6C-7D8E-9F10-1234567890CD}"
 	ProjectSection(SolutionItems) = preProject
-		docs\Mapster使用指南.md = docs\Mapster使用指南.md
-		docs\事件驱动系统监控模块使用指南.md = docs\事件驱动系统监控模块使用指南.md
-		docs\依赖注入配置指南.md = docs\依赖注入配置指南.md
-		docs\项目规范.md = docs\项目开发规范.md
+		docs\项目开发规范.md = docs\项目开发规范.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{E2F3A4B5-6C7D-8E9F-1011-1234567890DE}"
