@@ -481,3 +481,6 @@ docker-compose.*.yml
 publish/
 deploy/logs/
 deploy/temp/
+# pack.ps1 打包产物（后台 publish.zip / 前台 dist.zip），仅本地/上传服务器用，不入库
+deploy/publish.zip
+deploy/dist.zip
